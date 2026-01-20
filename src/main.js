@@ -47,40 +47,51 @@ async function initApp() {
     console.log('✅ Auth service initialized');
 
     const user = authService.getCurrentUser();
-    const hasUsers = await authService.hasAnyUser();
     console.log('👤 Current user:', user?.email || 'Not logged in');
-    console.log('👥 Has users in system:', hasUsers);
     
     const loadTime = Date.now() - startTime;
     console.log(`⚡ App loaded in ${loadTime}ms`);
 
-    // Hide loading screen with fade animation
+    // Hide loading screen immediately after auth check
     const loadingEl = document.getElementById('loading');
     if (loadingEl) {
-      loadingEl.style.transition = 'opacity 0.3s ease-out';
+      loadingEl.style.transition = 'opacity 0.2s ease-out';
       loadingEl.style.opacity = '0';
       setTimeout(() => {
         loadingEl.style.display = 'none';
-        // Make sure root is visible
         document.getElementById('root').style.display = 'block';
-      }, 300);
+      }, 200);
     }
 
     if (!user) {
-      // User not logged in
+      // User not logged in - check if users exist
+      // Use cached result if available for faster loading
+      const cachedHasUsers = localStorage.getItem('karteji_has_users');
+      let hasUsers = cachedHasUsers === 'true';
+      
+      if (cachedHasUsers === null) {
+        // First time - need to check
+        hasUsers = await authService.hasAnyUser();
+        localStorage.setItem('karteji_has_users', hasUsers.toString());
+      }
+      
+      console.log('👥 Has users in system:', hasUsers);
+      
       if (!hasUsers) {
-        // No users in system - show registration (but allow switching to login)
+        // No users in system - show registration
         console.log('📝 Showing registration screen (first user)');
-        setTimeout(() => showRegistrationScreen(), 350);
+        setTimeout(() => showRegistrationScreen(), 250);
       } else {
         // Users exist - show login
         console.log('🔑 Showing login screen');
-        setTimeout(() => showLoginScreen(), 350);
+        setTimeout(() => showLoginScreen(), 250);
       }
     } else {
-      // User logged in - initialize app
+      // User logged in - initialize app immediately
       console.log('✅ User logged in, initializing main app');
-      setTimeout(() => initMainApp(), 350);
+      // Set cache to true since we know users exist
+      localStorage.setItem('karteji_has_users', 'true');
+      setTimeout(() => initMainApp(), 250);
     }
   } catch (error) {
     console.error('❌ Error initializing app:', error);

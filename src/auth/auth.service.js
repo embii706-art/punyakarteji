@@ -141,6 +141,9 @@ class AuthService {
       
       this.currentUser = user;
       this.userProfile = { id: user.uid, ...userProfile };
+      
+      // Update cache - users now exist in system
+      localStorage.setItem('karteji_has_users', 'true');
 
       return { user, profile: this.userProfile };
     } catch (error) {
