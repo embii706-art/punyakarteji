@@ -35,8 +35,8 @@ export function createLayout() {
       </main>
 
       <!-- Bottom Navigation -->
-      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 flex-shrink-0">
-        <div class="flex justify-around items-center h-14 sm:h-16">
+      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-primary-200 shadow-2xl z-50 flex-shrink-0 rounded-t-2xl animate-fade-in">
+        <div class="flex justify-around items-center h-16 sm:h-20 px-2 sm:px-6 gap-1">
           ${createNavItem('dashboard', 'Dashboard', `
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           `)}
@@ -68,11 +68,14 @@ export function createLayout() {
 
 function createNavItem(route, label, iconPath) {
   return `
-    <a href="/${route}" data-route="${route}" class="nav-item flex flex-col items-center justify-center flex-1 py-1.5 sm:py-2 text-gray-600 hover:text-primary-600 transition active:bg-gray-50">
-      <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        ${iconPath}
-      </svg>
-      <span class="text-[10px] sm:text-xs mt-0.5 sm:mt-1">${label}</span>
+    <a href="/${route}" data-route="${route}" class="nav-item flex flex-col items-center justify-center flex-1 py-2 sm:py-3 text-gray-500 hover:text-primary-600 transition relative">
+      <div class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 shadow-md mb-1">
+        <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          ${iconPath}
+        </svg>
+      </div>
+      <span class="text-xs sm:text-sm font-semibold">${label}</span>
+      <span class="active-indicator absolute -top-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary-500 rounded-full opacity-0 transition-all"></span>
     </a>
   `;
 }
@@ -103,10 +106,12 @@ function updateActiveNav(route) {
   document.querySelectorAll('.nav-item').forEach(item => {
     if (item.dataset.route === route) {
       item.classList.add('text-primary-600');
-      item.classList.remove('text-gray-600');
+      item.classList.remove('text-gray-500');
+      item.querySelector('.active-indicator').style.opacity = '1';
     } else {
       item.classList.remove('text-primary-600');
-      item.classList.add('text-gray-600');
+      item.classList.add('text-gray-500');
+      item.querySelector('.active-indicator').style.opacity = '0';
     }
   });
 }

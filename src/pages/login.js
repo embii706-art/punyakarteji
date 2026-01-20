@@ -194,13 +194,13 @@ export function LoginPage(isRegistration = false) {
             });
 
             // Reload to initialize main app
-            window.location.reload();
+            window.location.href = '/dashboard';
           } else {
             // Login
             await authService.login(email, password);
             
             // Reload to initialize main app
-            window.location.reload();
+            window.location.href = '/dashboard';
           }
         } catch (error) {
           console.error('Auth error:', error);

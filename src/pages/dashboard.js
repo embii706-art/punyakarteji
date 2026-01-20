@@ -18,11 +18,8 @@ export function DashboardPage() {
 
       <!-- Quick Stats -->
       <div class="p-4 -mt-6">
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          ${createStatCard('Anggota', '0', 'users', 'bg-blue-500')}
-          ${createStatCard('Bank Sampah', '0 kg', 'trash', 'bg-green-500')}
-          ${createStatCard('Keuangan', 'Rp 0', 'cash', 'bg-yellow-500')}
-          ${createStatCard('UMKM', '0', 'store', 'bg-purple-500')}
+        <div class="grid grid-cols-2 gap-3 mb-4" id="dashboardStats">
+          <!-- Stats will be loaded here -->
         </div>
 
         <!-- Charts Section -->
@@ -60,9 +57,7 @@ export function DashboardPage() {
               Aktivitas Terbaru
             </h3>
             <div id="recentActivities" class="space-y-3">
-              <div class="text-center text-gray-500 py-4">
-                Memuat aktivitas...
-              </div>
+              <!-- Activities will be loaded here -->
             </div>
           </div>
         </div>
@@ -75,9 +70,117 @@ export function DashboardPage() {
 
   // Load data after render
   setTimeout(() => {
-    loadDashboardData();
-    initCharts();
+    loadDashboardStats();
+    loadWasteChart();
+    loadFinanceChart();
+    loadRecentActivities();
   }, 0);
+// Load live stats from Firebase
+async function loadDashboardStats() {
+  const statsEl = document.getElementById('dashboardStats');
+  if (!statsEl) return;
+  // Fetch stats from Firebase
+  const anggotaSnap = await getDocs(collection(db, 'anggota'));
+  const bankSampahSnap = await getDocs(collection(db, 'bank_sampah'));
+  const keuanganSnap = await getDocs(collection(db, 'keuangan'));
+  const umkmSnap = await getDocs(collection(db, 'umkm'));
+  statsEl.innerHTML = `
+    ${createStatCard('Anggota', anggotaSnap.size, 'users', 'bg-blue-500')}
+    ${createStatCard('Bank Sampah', `${bankSampahSnap.size} kg`, 'trash', 'bg-green-500')}
+    ${createStatCard('Keuangan', `Rp ${getTotalKeuangan(keuanganSnap)}`, 'cash', 'bg-yellow-500')}
+    ${createStatCard('UMKM', umkmSnap.size, 'store', 'bg-purple-500')}
+  `;
+}
+
+function getTotalKeuangan(snap) {
+  let total = 0;
+  snap.forEach(doc => {
+    const data = doc.data();
+    if (data && typeof data.amount === 'number') total += data.amount;
+  });
+  return total.toLocaleString('id-ID');
+}
+
+// Load waste chart from Firebase
+async function loadWasteChart() {
+  const chartEl = document.getElementById('wasteChart');
+  if (!chartEl) return;
+  // Fetch monthly waste data
+  const wasteSnap = await getDocs(query(collection(db, 'bank_sampah'), orderBy('date')));
+  const monthly = {};
+  wasteSnap.forEach(doc => {
+    const data = doc.data();
+    if (data && data.date && data.amount) {
+      const month = data.date.substr(0,7); // YYYY-MM
+      monthly[month] = (monthly[month] || 0) + data.amount;
+    }
+  });
+  const labels = Object.keys(monthly);
+  const values = Object.values(monthly);
+  new window.Chart(chartEl, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Sampah (kg)',
+        data: values,
+        backgroundColor: '#22c55e',
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+}
+
+// Load finance chart from Firebase
+async function loadFinanceChart() {
+  const chartEl = document.getElementById('financeChart');
+  if (!chartEl) return;
+  // Fetch monthly finance data
+  const financeSnap = await getDocs(query(collection(db, 'keuangan'), orderBy('date')));
+  const monthly = {};
+  financeSnap.forEach(doc => {
+    const data = doc.data();
+    if (data && data.date && data.amount) {
+      const month = data.date.substr(0,7); // YYYY-MM
+      monthly[month] = (monthly[month] || 0) + data.amount;
+    }
+  });
+  const labels = Object.keys(monthly);
+  const values = Object.values(monthly);
+  new window.Chart(chartEl, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Keuangan (Rp)',
+        data: values,
+        borderColor: '#eab308',
+        backgroundColor: 'rgba(234,179,8,0.2)',
+        fill: true,
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+}
+
+// Load recent activities from Firebase
+async function loadRecentActivities() {
+  const actEl = document.getElementById('recentActivities');
+  if (!actEl) return;
+  // Fetch recent activities (last 10)
+  const activitiesSnap = await getDocs(query(collection(db, 'activities'), orderBy('date', 'desc'), limit(10)));
+  if (activitiesSnap.empty) {
+    actEl.innerHTML = '<div class="text-center text-gray-500 py-4">Belum ada aktivitas terbaru.</div>';
+    return;
+  }
+  actEl.innerHTML = Array.from(activitiesSnap.docs).map(doc => {
+    const data = doc.data();
+    return `<div class="rounded-lg bg-gray-100 p-3 text-xs sm:text-sm flex items-center justify-between mb-2">
+      <span>${data?.description || 'Aktivitas'}</span>
+      <span class="text-gray-400">${data?.date?.replace('T',' ')?.substr(0,16) || ''}</span>
+    </div>`;
+  }).join('');
+}
 
   return html;
 }

@@ -7,29 +7,109 @@ import {
   getDocs, 
   updateDoc,
   doc,
-  query,
-  orderBy,
-  where,
-  serverTimestamp,
-  limit
-} from 'firebase/firestore';
-import { db } from '../../config/firebase.js';
+  return `
+    <div class="bg-gray-50 min-h-screen pb-20">
+      <div class="bg-blue-600 text-white p-4">
+        <h1 class="text-xl font-bold">Kotak Aspirasi</h1>
+        <p class="text-sm text-blue-100">Sampaikan aspirasi, kritik, dan saran Anda</p>
+      </div>
 
-// Aspiration categories
-export const ASPIRATION_CATEGORIES = {
-  KEGIATAN: 'kegiatan',
-  LINGKUNGAN: 'lingkungan',
-  UMKM: 'umkm',
-  LAIN: 'lain-lain'
-};
+      <div class="p-4">
+        <button 
+          id="addAspirationBtn"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg mb-4"
+        >
+          + Tambah Aspirasi
+        </button>
 
-export const ASPIRATION_STATUS = {
-  BARU: 'baru',
-  DIPROSES: 'diproses',
-  SELESAI: 'selesai'
-};
+        <div id="aspirationList" class="space-y-3">
+          <div class="text-center py-8 text-gray-500">
+            Memuat data aspirasi...
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
 
-const CATEGORY_LABELS = {
+setTimeout(() => {
+  loadAspirations();
+  document.getElementById('addAspirationBtn').onclick = showAddAspirationModal;
+}, 0);
+
+// Load aspirations from Firebase
+async function loadAspirations() {
+  const listEl = document.getElementById('aspirationList');
+  if (!listEl) return;
+  const snap = await getDocs(collection(db, 'aspiration'));
+  if (snap.empty) {
+    listEl.innerHTML = '<div class="text-center py-8 text-gray-500">Belum ada aspirasi.</div>';
+    return;
+  }
+  listEl.innerHTML = Array.from(snap.docs).map(doc => {
+    const data = doc.data();
+    return `<div class="bg-white rounded-xl shadow p-3 flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+      <div>
+        <div class="font-bold text-blue-700 text-base">${data.title}</div>
+        <div class="text-xs text-gray-500">${data.content}</div>
+        <div class="text-xs text-gray-400">${data.sender || '-'} | ${data.date?.substr(0,10) || ''}</div>
+      </div>
+      <div class="flex gap-2 mt-2 sm:mt-0">
+        <button class="edit-btn px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold" data-id="${doc.id}">Edit</button>
+        <button class="delete-btn px-3 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-semibold" data-id="${doc.id}">Hapus</button>
+      </div>
+    </div>`;
+  }).join('');
+  // Add event listeners
+  listEl.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.onclick = () => showEditAspirationModal(btn.dataset.id);
+  });
+  listEl.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.onclick = () => deleteAspiration(btn.dataset.id);
+  });
+}
+
+// Show add aspiration modal
+function showAddAspirationModal() {
+  const title = prompt('Judul aspirasi:');
+  if (!title) return;
+  const content = prompt('Isi aspirasi:');
+  if (!content) return;
+  const sender = prompt('Pengirim/anggota:');
+  const date = prompt('Tanggal (YYYY-MM-DD):', new Date().toISOString().substr(0,10));
+  addAspiration({ title, content, sender, date });
+}
+
+// Add aspiration to Firebase
+async function addAspiration(data) {
+  await addDoc(collection(db, 'aspiration'), {
+    ...data,
+    createdAt: new Date().toISOString()
+  });
+  loadAspirations();
+}
+
+// Show edit aspiration modal
+async function showEditAspirationModal(id) {
+  const docRef = doc(db, 'aspiration', id);
+  const snap = await getDocs(query(collection(db, 'aspiration'), where('__name__', '==', id)));
+  if (snap.empty) return;
+  const data = snap.docs[0].data();
+  const title = prompt('Edit judul:', data.title);
+  if (!title) return;
+  const content = prompt('Edit isi:', data.content);
+  const sender = prompt('Edit pengirim:', data.sender);
+  const date = prompt('Edit tanggal (YYYY-MM-DD):', data.date);
+  await updateDoc(docRef, { title, content, sender, date });
+  loadAspirations();
+}
+
+// Delete aspiration from Firebase
+async function deleteAspiration(id) {
+  if (!confirm('Yakin ingin menghapus aspirasi ini?')) return;
+  await updateDoc(doc(db, 'aspiration', id), { deleted: true });
+  loadAspirations();
+}
   [ASPIRATION_CATEGORIES.KEGIATAN]: 'Kegiatan',
   [ASPIRATION_CATEGORIES.LINGKUNGAN]: 'Lingkungan',
   [ASPIRATION_CATEGORIES.UMKM]: 'UMKM',
