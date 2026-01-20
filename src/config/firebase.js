@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyC5L623gExYou8GXWvOlaKJAw-5An35ukI",
   authDomain: "karteji-e367d.firebaseapp.com",
   projectId: "karteji-e367d",
-  storageBucket: "karteji-e367d.firebasestorage.app",
+  storageBucket: "karteji-e367d.appspot.com",
   messagingSenderId: "877730599886",
   appId: "1:877730599886:web:754465058330f6853ed19f"
 };
