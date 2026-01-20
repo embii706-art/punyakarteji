@@ -52,6 +52,20 @@ async function initApp() {
     const loadTime = Date.now() - startTime;
     console.log(`⚡ App loaded in ${loadTime}ms`);
 
+    // Hide loading screen immediately
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+      console.log('🔄 Hiding loading screen...');
+      loadingEl.style.display = 'none';
+    }
+    
+    // Show root element immediately
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      console.log('👁️ Showing root element...');
+      rootEl.style.display = 'block';
+    }
+
     if (!user) {
       // User not logged in - check if users exist
       // Use cached result if available for faster loading
@@ -60,54 +74,28 @@ async function initApp() {
       
       if (cachedHasUsers === null) {
         // First time - need to check
+        console.log('🔍 Checking for existing users...');
         hasUsers = await authService.hasAnyUser();
         localStorage.setItem('karteji_has_users', hasUsers.toString());
       }
       
       console.log('👥 Has users in system:', hasUsers);
       
-      // Hide loading screen immediately before showing content
-      const loadingEl = document.getElementById('loading');
-      if (loadingEl) {
-        loadingEl.style.transition = 'opacity 0.2s ease-out';
-        loadingEl.style.opacity = '0';
-        setTimeout(() => {
-          loadingEl.style.display = 'none';
-        }, 200);
-      }
-      
-      // Show root element
-      document.getElementById('root').style.display = 'block';
-      
       if (!hasUsers) {
         // No users in system - show registration
         console.log('📝 Showing registration screen (first user)');
-        setTimeout(() => showRegistrationScreen(), 250);
+        showRegistrationScreen();
       } else {
         // Users exist - show login
         console.log('🔑 Showing login screen');
-        setTimeout(() => showLoginScreen(), 250);
+        showLoginScreen();
       }
     } else {
       // User logged in - initialize app immediately
       console.log('✅ User logged in, initializing main app');
       // Set cache to true since we know users exist
       localStorage.setItem('karteji_has_users', 'true');
-      
-      // Hide loading screen immediately before showing content
-      const loadingEl = document.getElementById('loading');
-      if (loadingEl) {
-        loadingEl.style.transition = 'opacity 0.2s ease-out';
-        loadingEl.style.opacity = '0';
-        setTimeout(() => {
-          loadingEl.style.display = 'none';
-        }, 200);
-      }
-      
-      // Show root element
-      document.getElementById('root').style.display = 'block';
-      
-      setTimeout(() => initMainApp(), 250);
+      initMainApp();
     }
   } catch (error) {
     console.error('❌ Error initializing app:', error);
@@ -131,16 +119,32 @@ async function initApp() {
 }
 
 function showLoginScreen() {
+  console.log('📄 Rendering login page...');
   const rootEl = document.getElementById('root');
+  if (!rootEl) {
+    console.error('❌ Root element not found!');
+    return;
+  }
+  
   rootEl.style.display = 'block';
-  rootEl.innerHTML = LoginPage();
+  const loginHTML = LoginPage();
+  console.log('📝 Login HTML length:', loginHTML?.length || 0);
+  rootEl.innerHTML = loginHTML;
   console.log('✅ Login screen rendered');
 }
 
 function showRegistrationScreen() {
+  console.log('📄 Rendering registration page...');
   const rootEl = document.getElementById('root');
+  if (!rootEl) {
+    console.error('❌ Root element not found!');
+    return;
+  }
+  
   rootEl.style.display = 'block';
-  rootEl.innerHTML = LoginPage(true); // Pass true for registration mode
+  const regHTML = LoginPage(true);
+  console.log('📝 Registration HTML length:', regHTML?.length || 0);
+  rootEl.innerHTML = regHTML;
   console.log('✅ Registration screen rendered');
 }
 
