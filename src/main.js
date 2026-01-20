@@ -61,6 +61,8 @@ async function initApp() {
       loadingEl.style.opacity = '0';
       setTimeout(() => {
         loadingEl.style.display = 'none';
+        // Make sure root is visible
+        document.getElementById('root').style.display = 'block';
       }, 300);
     }
 
@@ -69,16 +71,16 @@ async function initApp() {
       if (!hasUsers) {
         // No users in system - show registration
         console.log('📝 Showing registration screen (first user)');
-        showRegistrationScreen();
+        setTimeout(() => showRegistrationScreen(), 350);
       } else {
         // Users exist - show login
         console.log('🔑 Showing login screen');
-        showLoginScreen();
+        setTimeout(() => showLoginScreen(), 350);
       }
     } else {
       // User logged in - initialize app
       console.log('✅ User logged in, initializing main app');
-      initMainApp();
+      setTimeout(() => initMainApp(), 350);
     }
   } catch (error) {
     console.error('❌ Error initializing app:', error);
@@ -100,17 +102,19 @@ async function initApp() {
     }
   }
 }
-
-function showLoginScreen() {
-  document.getElementById('root').innerHTML = '';
-  const app = document.getElementById('root');
-  app.innerHTML = LoginPage();
+rootEl = document.getElementById('root');
+  rootEl.style.display = 'block';
+  rootEl.innerHTML = LoginPage();
+  console.log('✅ Login screen rendered');
 }
 
 function showRegistrationScreen() {
-  document.getElementById('root').innerHTML = '';
-  const app = document.getElementById('root');
-  app.innerHTML = LoginPage(true); // Pass true for registration mode
+  const rootEl = document.getElementById('root');
+  rootEl.style.display = 'block';
+  rootEl.innerHTML = LoginPage(true); // Pass true for registration mode
+  console.log('✅ Registration screen rendered'form.addEventListener('submit', handleRegister);
+    }
+  }, 0);
 }
 
 function initMainApp() {
