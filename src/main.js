@@ -52,17 +52,6 @@ async function initApp() {
     const loadTime = Date.now() - startTime;
     console.log(`⚡ App loaded in ${loadTime}ms`);
 
-    // Hide loading screen immediately after auth check
-    const loadingEl = document.getElementById('loading');
-    if (loadingEl) {
-      loadingEl.style.transition = 'opacity 0.2s ease-out';
-      loadingEl.style.opacity = '0';
-      setTimeout(() => {
-        loadingEl.style.display = 'none';
-        document.getElementById('root').style.display = 'block';
-      }, 200);
-    }
-
     if (!user) {
       // User not logged in - check if users exist
       // Use cached result if available for faster loading
@@ -76,6 +65,19 @@ async function initApp() {
       }
       
       console.log('👥 Has users in system:', hasUsers);
+      
+      // Hide loading screen immediately before showing content
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.transition = 'opacity 0.2s ease-out';
+        loadingEl.style.opacity = '0';
+        setTimeout(() => {
+          loadingEl.style.display = 'none';
+        }, 200);
+      }
+      
+      // Show root element
+      document.getElementById('root').style.display = 'block';
       
       if (!hasUsers) {
         // No users in system - show registration
@@ -91,6 +93,20 @@ async function initApp() {
       console.log('✅ User logged in, initializing main app');
       // Set cache to true since we know users exist
       localStorage.setItem('karteji_has_users', 'true');
+      
+      // Hide loading screen immediately before showing content
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        loadingEl.style.transition = 'opacity 0.2s ease-out';
+        loadingEl.style.opacity = '0';
+        setTimeout(() => {
+          loadingEl.style.display = 'none';
+        }, 200);
+      }
+      
+      // Show root element
+      document.getElementById('root').style.display = 'block';
+      
       setTimeout(() => initMainApp(), 250);
     }
   } catch (error) {
