@@ -1,0 +1,1 @@
+export function save(data){ localStorage.setItem('waste',JSON.stringify(data)); }
