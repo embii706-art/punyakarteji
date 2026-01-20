@@ -113,7 +113,9 @@ async function initApp() {
     }
   }
 }
-rootEl = document.getElementById('root');
+
+function showLoginScreen() {
+  const rootEl = document.getElementById('root');
   rootEl.style.display = 'block';
   rootEl.innerHTML = LoginPage();
   console.log('✅ Login screen rendered');
@@ -123,9 +125,7 @@ function showRegistrationScreen() {
   const rootEl = document.getElementById('root');
   rootEl.style.display = 'block';
   rootEl.innerHTML = LoginPage(true); // Pass true for registration mode
-  console.log('✅ Registration screen rendered'form.addEventListener('submit', handleRegister);
-    }
-  }, 0);
+  console.log('✅ Registration screen rendered');
 }
 
 function initMainApp() {

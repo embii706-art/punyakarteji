@@ -28,68 +28,73 @@ export function LoginPage(isRegistration = false) {
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
               <p class="text-xs sm:text-sm text-blue-800">
                 <strong>Setup Administrator</strong><br/>
-                Anda adalalg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6">
+                Anda adalah pengguna pertama. Akun Anda akan menjadi Super Admin.
+              </p>
+            </div>
+          ` : ''}
+
+          <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6">
             ${showLoginForm ? 'Login' : 'Register Super Admin'}
           </h2>
 
           <form id="loginForm" class="space-y-3 sm:space-y-4">
-            ${!showLoginForm font-bold text-gray-800 mb-6">
-            ${setupFirstUser ? 'Register Super Admin' : 'Login'}
-          </h2>
-
-          <form id="loginForm" class="space-y-4">
-            ${setupFirstUser ? `
+            ${!showLoginForm ? `
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Nama Lengkap</label>
                 <input 
                   type="text" 
                   id="name" 
                   required
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Nama lengkap Anda"
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP</label>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Nomor HP</label>
                 <input 
                   type="tel" 
                   id="phone"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="08xxxxxxxxxx"
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Alamat</label>
                 <textarea 
                   id="address"
                   rows="2"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Alamat lengkap"
                 ></textarea>
               </div>
             ` : ''}
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Email</label>
               <input 
                 type="email" 
                 id="email" 
                 required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="email@example.com"
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Password</label>
               <input 
                 type="password" 
                 id="password" 
                 required
                 minlength="6"
-              !showLoginForm ? `
+                class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Min. 6 karakter"
+              />
+            </div>
+
+            ${!showLoginForm ? `
               <div>
                 <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Konfirmasi Password</label>
                 <input 
@@ -110,29 +115,24 @@ export function LoginPage(isRegistration = false) {
               id="submitBtn"
               class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 sm:py-3 rounded-lg transition duration-200 flex items-center justify-center text-sm sm:text-base"
             >
-              <span id="btnText">${showLoginForm ? 'Login' : 'Register
-              type="submit" 
-              id="submitBtn"
-              class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-lg transition duration-200 flex items-center justify-center"
-            >
-              <span id="btnText">${setupFirstUser ? 'Register' : 'Login'}</span>
+              <span id="btnText">${showLoginForm ? 'Login' : 'Register'}</span>
               <svg id="btnSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </button>
-          </showLoginForm ? `
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 px-4 sm:px-6 py-4 text-center">
+          ${showLoginForm ? `
             <p class="text-xs sm:text-sm text-gray-600">
               Belum punya akun? Hubungi administrator.
             </p>
           ` : `
             <p class="text-xs sm:text-sm text-gray-600">
-              Sudah punya akun? <a href="#loginext-gray-600">
-              Belum punya akun? Hubungi administrator.
-            </p>
-          ` : `
-            <p class="text-xs sm:text-sm text-gray-600">
-              Sudah punya akun? <a href="#" id="switchToLogin" class="text-primary-600 hover:underline font-semibold">Login di sini</a>
+              Sudah punya akun? <a href="#login" id="switchToLogin" class="text-primary-600 hover:underline font-semibold">Login di sini</a>
             </p>
           `}
           <p class="text-xs text-gray-500 mt-2">
@@ -151,7 +151,12 @@ export function LoginPage(isRegistration = false) {
     const errorMessage = document.getElementById('errorMessage');
     const switchToLoginBtn = document.getElementById('switchToLogin');
 
-    // Hwindow.location.hash = 'login';
+    // Handle switch to login mode
+    if (switchToLoginBtn) {
+      switchToLoginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Switching to login mode');
+        window.location.hash = 'login';
         // Re-render page in login mode
         document.getElementById('root').innerHTML = LoginPage(false);
       });
@@ -171,12 +176,7 @@ export function LoginPage(isRegistration = false) {
         errorMessage.classList.add('hidden');
 
         try {
-          if (!showLoginFormd('hidden');
-        btnSpinner.classList.remove('hidden');
-        errorMessage.classList.add('hidden');
-
-        try {
-          if (setupFirstUser) {
+          if (!showLoginForm) {
             // Registration
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone')?.value || '';
