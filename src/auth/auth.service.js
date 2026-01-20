@@ -145,6 +145,35 @@ class AuthService {
       return { user, profile: this.userProfile };
     } catch (error) {
       console.error('Error registering first user:', error);
+      
+      // Provide more helpful error messages
+      if (error.code === 'auth/configuration-not-found') {
+        const helpfulError = new Error(
+          'Firebase Authentication belum dikonfigurasi.\n\n' +
+          '📝 Langkah setup:\n' +
+          '1. Buka Firebase Console: https://console.firebase.google.com/project/karteji-e367d/authentication/providers\n' +
+          '2. Klik "Get Started" atau "Add new provider"\n' +
+          '3. Pilih "Email/Password"\n' +
+          '4. Toggle "Enable" menjadi ON\n' +
+          '5. Klik "Save"\n' +
+          '6. Refresh halaman ini dan coba lagi'
+        );
+        helpfulError.code = error.code;
+        throw helpfulError;
+      }
+      
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Email sudah terdaftar');
+      }
+      
+      if (error.code === 'auth/weak-password') {
+        throw new Error('Password terlalu lemah (min. 6 karakter)');
+      }
+      
+      if (error.code === 'auth/invalid-email') {
+        throw new Error('Format email tidak valid');
+      }
+      
       throw error;
     }
   }
@@ -167,6 +196,34 @@ class AuthService {
       return { user: this.currentUser, profile: this.userProfile };
     } catch (error) {
       console.error('Error logging in:', error);
+      
+      // Provide more helpful error messages
+      if (error.code === 'auth/configuration-not-found') {
+        const helpfulError = new Error(
+          'Firebase Authentication belum dikonfigurasi. ' +
+          'Silakan aktifkan Email/Password sign-in di Firebase Console: ' +
+          'https://console.firebase.google.com/project/karteji-e367d/authentication/providers'
+        );
+        helpfulError.code = error.code;
+        throw helpfulError;
+      }
+      
+      if (error.code === 'auth/user-not-found') {
+        throw new Error('Email tidak ditemukan');
+      }
+      
+      if (error.code === 'auth/wrong-password') {
+        throw new Error('Password salah');
+      }
+      
+      if (error.code === 'auth/invalid-email') {
+        throw new Error('Format email tidak valid');
+      }
+      
+      if (error.code === 'auth/too-many-requests') {
+        throw new Error('Terlalu banyak percobaan login. Coba lagi nanti.');
+      }
+      
       throw error;
     }
   }
