@@ -6,22 +6,22 @@ export function LoginPage(isRegistration = false) {
   const setupFirstUser = isRegistration;
 
   const html = `
-    <div class="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-3 sm:p-4">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary-600 text-white p-6 text-center">
-          <svg class="w-16 h-16 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-primary-600 text-white p-4 sm:p-6 text-center">
+          <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <h1 class="text-2xl font-bold">KARTEJI</h1>
-          <p class="text-sm text-primary-100">Karang Taruna Digital</p>
+          <h1 class="text-xl sm:text-2xl font-bold">KARTEJI</h1>
+          <p class="text-xs sm:text-sm text-primary-100">Karang Taruna Digital</p>
         </div>
 
         <!-- Form -->
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
           ${setupFirstUser ? `
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <p class="text-sm text-blue-800">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+              <p class="text-xs sm:text-sm text-blue-800">
                 <strong>Setup Administrator</strong><br/>
                 Anda adalah pengguna pertama. Akun Anda akan menjadi Super Admin.
               </p>
