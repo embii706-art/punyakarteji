@@ -113,11 +113,13 @@ async function deleteAspiration(id) {
   await updateDoc(doc(db, 'aspiration', id), { deleted: true });
   loadAspirations();
 }
-  [ASPIRATION_CATEGORIES.KEGIATAN]: 'Kegiatan',
-  [ASPIRATION_CATEGORIES.LINGKUNGAN]: 'Lingkungan',
-  [ASPIRATION_CATEGORIES.UMKM]: 'UMKM',
-  [ASPIRATION_CATEGORIES.LAIN]: 'Lain-lain'
-};
+
+  const ASPIRATION_CATEGORY_LABELS = {
+    KEGIATAN: 'Kegiatan',
+    LINGKUNGAN: 'Lingkungan',
+    UMKM: 'UMKM',
+    LAIN: 'Lain-lain'
+  };
 
 const STATUS_LABELS = {
   [ASPIRATION_STATUS.BARU]: 'Baru',
