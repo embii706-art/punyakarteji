@@ -17,23 +17,51 @@ import { AspirationPage } from './modules/aspiration/index.js';
 
 // Initialize app
 async function initApp() {
+  const startTime = Date.now();
+  
   try {
     console.log('🚀 Starting KARTEJI app...');
     
-    // Initialize auth service
+    // Show loading timeout warning after 5 seconds
+    const timeoutWarning = setTimeout(() => {
+      const loadingEl = document.getElementById('loading');
+      if (loadingEl) {
+        const warningText = loadingEl.querySelector('p');
+        if (warningText) {
+          warningText.textContent = 'Loading taking longer than usual...';
+        }
+      }
+    }, 5000);
+    
+    // Initialize auth service with race condition
     console.log('🔐 Initializing auth service...');
-    await authService.init();
+    const authInitPromise = authService.init();
+    
+    // Set maximum wait time (10 seconds)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Connection timeout - check your internet connection')), 10000);
+    });
+    
+    await Promise.race([authInitPromise, timeoutPromise]);
+    clearTimeout(timeoutWarning);
     console.log('✅ Auth service initialized');
 
     const user = authService.getCurrentUser();
     const hasUsers = await authService.hasAnyUser();
     console.log('👤 Current user:', user?.email || 'Not logged in');
     console.log('👥 Has users in system:', hasUsers);
+    
+    const loadTime = Date.now() - startTime;
+    console.log(`⚡ App loaded in ${loadTime}ms`);
 
-    // Hide loading screen
+    // Hide loading screen with fade animation
     const loadingEl = document.getElementById('loading');
     if (loadingEl) {
-      loadingEl.style.display = 'none';
+      loadingEl.style.transition = 'opacity 0.3s ease-out';
+      loadingEl.style.opacity = '0';
+      setTimeout(() => {
+        loadingEl.style.display = 'none';
+      }, 300);
     }
 
     if (!user) {
@@ -56,6 +84,7 @@ async function initApp() {
     console.error('❌ Error initializing app:', error);
     const loadingEl = document.getElementById('loading');
     if (loadingEl) {
+      loadingEl.style.opacity = '1';
       loadingEl.innerHTML = `
         <div class="text-center text-white p-4">
           <h1 class="text-2xl font-bold mb-4">⚠️ Error</h1>

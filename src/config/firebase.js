@@ -1,7 +1,7 @@
 // Firebase core configuration for KARTEJI
 import { initializeApp } from 'firebase/app';
 import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 console.log('🔥 Initializing Firebase...');
@@ -31,18 +31,24 @@ try {
   // Firebase services
   auth = getAuth(app);
   
-  // Set persistence to LOCAL (survives browser refresh)
-  setPersistence(auth, browserLocalPersistence)
-    .then(() => {
-      console.log('✅ Firebase Auth persistence set to LOCAL');
-    })
-    .catch((error) => {
-      console.warn('⚠️ Auth persistence error:', error.code, error.message);
-    });
+  // Set persistence to LOCAL (survives browser refresh) - non-blocking
+  setPersistence(auth, browserLocalPersistence).catch((error) => {
+    console.warn('⚠️ Auth persistence error:', error.code);
+  });
   
   console.log('✅ Firebase Auth initialized');
   
   db = getFirestore(app);
+  
+  // Enable offline persistence - non-blocking
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('⚠️ Offline persistence: Multiple tabs open');
+    } else if (err.code === 'unimplemented') {
+      console.warn('⚠️ Offline persistence: Not supported in this browser');
+    }
+  });
+  
   console.log('✅ Firestore initialized');
   
   storage = getStorage(app);
