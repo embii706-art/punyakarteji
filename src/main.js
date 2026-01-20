@@ -18,39 +18,57 @@ import { AspirationPage } from './modules/aspiration/index.js';
 // Initialize app
 async function initApp() {
   try {
+    console.log('🚀 Starting KARTEJI app...');
+    
     // Initialize auth service
+    console.log('🔐 Initializing auth service...');
     await authService.init();
+    console.log('✅ Auth service initialized');
 
     const user = authService.getCurrentUser();
     const hasUsers = await authService.hasAnyUser();
+    console.log('👤 Current user:', user?.email || 'Not logged in');
+    console.log('👥 Has users in system:', hasUsers);
 
     // Hide loading screen
-    document.getElementById('loading').style.display = 'none';
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
+    }
 
     if (!user) {
       // User not logged in
       if (!hasUsers) {
         // No users in system - show registration
+        console.log('📝 Showing registration screen (first user)');
         showRegistrationScreen();
       } else {
         // Users exist - show login
+        console.log('🔑 Showing login screen');
         showLoginScreen();
       }
     } else {
       // User logged in - initialize app
+      console.log('✅ User logged in, initializing main app');
       initMainApp();
     }
   } catch (error) {
-    console.error('Error initializing app:', error);
-    document.getElementById('loading').innerHTML = `
-      <div class="text-center text-white">
-        <h1 class="text-2xl font-bold mb-4">Error</h1>
-        <p>${error.message}</p>
-        <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-white text-primary-600 rounded-lg font-semibold">
-          Retry
-        </button>
-      </div>
-    `;
+    console.error('❌ Error initializing app:', error);
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+      loadingEl.innerHTML = `
+        <div class="text-center text-white p-4">
+          <h1 class="text-2xl font-bold mb-4">⚠️ Error</h1>
+          <p class="mb-4">${error.message}</p>
+          <button 
+            onclick="location.reload()" 
+            class="px-6 py-2 bg-white text-primary-600 rounded-lg font-semibold hover:bg-gray-100"
+          >
+            Retry
+          </button>
+        </div>
+      `;
+    }
   }
 }
 
