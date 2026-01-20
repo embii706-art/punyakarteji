@@ -4,6 +4,8 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
+console.log('🔥 Initializing Firebase...');
+
 // Firebase Web Config
 const firebaseConfig = {
   apiKey: "AIzaSyC5L623gExYou8GXWvOlaKJAw-5An35ukI",
@@ -15,9 +17,24 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+let app, auth, db, storage;
 
-// Firebase services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+try {
+  app = initializeApp(firebaseConfig);
+  console.log('✅ Firebase app initialized');
+
+  // Firebase services
+  auth = getAuth(app);
+  console.log('✅ Firebase Auth initialized');
+  
+  db = getFirestore(app);
+  console.log('✅ Firestore initialized');
+  
+  storage = getStorage(app);
+  console.log('✅ Firebase Storage initialized');
+} catch (error) {
+  console.error('❌ Firebase initialization error:', error);
+  throw error;
+}
+
+export { app, auth, db, storage };

@@ -147,7 +147,26 @@ function initMainApp() {
 }
 
 // Start the app
-initApp();
+console.log('🔥 Starting KARTEJI initialization...');
+initApp().catch(err => {
+  console.error('💥 Fatal error during initialization:', err);
+  const loadingEl = document.getElementById('loading');
+  if (loadingEl) {
+    loadingEl.innerHTML = `
+      <div class="text-center text-white p-4">
+        <h1 class="text-2xl font-bold mb-4">❌ Error</h1>
+        <p class="mb-2 text-red-200">${err.message}</p>
+        <pre class="text-xs text-left bg-red-900 p-2 rounded mb-4 overflow-auto">${err.stack}</pre>
+        <button 
+          onclick="location.reload()" 
+          class="px-6 py-2 bg-white text-red-600 rounded-lg font-semibold hover:bg-gray-100"
+        >
+          Reload Page
+        </button>
+      </div>
+    `;
+  }
+});
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
