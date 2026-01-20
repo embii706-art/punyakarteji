@@ -6,7 +6,10 @@ import {
   addDoc, 
   getDocs, 
   updateDoc,
-  doc,
+  doc
+} from 'firebase/firestore';
+
+export function AspirationPage() {
   return `
     <div class="bg-gray-50 min-h-screen pb-20">
       <div class="bg-blue-600 text-white p-4">
