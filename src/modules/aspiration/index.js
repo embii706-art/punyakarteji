@@ -9,31 +9,6 @@ import {
   doc
 } from 'firebase/firestore';
 
-export function AspirationPage() {
-  return `
-    <div class="bg-gray-50 min-h-screen pb-20">
-      <div class="bg-blue-600 text-white p-4">
-        <h1 class="text-xl font-bold">Kotak Aspirasi</h1>
-        <p class="text-sm text-blue-100">Sampaikan aspirasi, kritik, dan saran Anda</p>
-      </div>
-
-      <div class="p-4">
-        <button 
-          id="addAspirationBtn"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg mb-4"
-        >
-          + Tambah Aspirasi
-        </button>
-
-        <div id="aspirationList" class="space-y-3">
-          <div class="text-center py-8 text-gray-500">
-            Memuat data aspirasi...
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
 
 setTimeout(() => {
   loadAspirations();
