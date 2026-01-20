@@ -35,7 +35,6 @@ export function FinancePage() {
       </div>
     </div>
   `;
-}
 
 setTimeout(() => {
   loadTransactions();
