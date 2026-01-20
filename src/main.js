@@ -69,7 +69,7 @@ async function initApp() {
     if (!user) {
       // User not logged in
       if (!hasUsers) {
-        // No users in system - show registration
+        // No users in system - show registration (but allow switching to login)
         console.log('📝 Showing registration screen (first user)');
         setTimeout(() => showRegistrationScreen(), 350);
       } else {

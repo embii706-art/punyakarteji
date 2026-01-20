@@ -4,6 +4,11 @@ import { authService } from '../auth/auth.service.js';
 export function LoginPage(isRegistration = false) {
   // Check if this is first user registration
   const setupFirstUser = isRegistration;
+  
+  // Allow manual mode override via URL hash
+  const urlMode = window.location.hash;
+  const forceLoginMode = urlMode === '#login';
+  const showLoginForm = !setupFirstUser || forceLoginMode;
 
   const html = `
     <div class="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-3 sm:p-4">
@@ -19,16 +24,16 @@ export function LoginPage(isRegistration = false) {
 
         <!-- Form -->
         <div class="p-4 sm:p-6">
-          ${setupFirstUser ? `
+          ${setupFirstUser && !forceLoginMode ? `
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
               <p class="text-xs sm:text-sm text-blue-800">
                 <strong>Setup Administrator</strong><br/>
-                Anda adalah pengguna pertama. Akun Anda akan menjadi Super Admin.
-              </p>
-            </div>
-          ` : ''}
+                Anda adalalg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6">
+            ${showLoginForm ? 'Login' : 'Register Super Admin'}
+          </h2>
 
-          <h2 class="text-xl font-bold text-gray-800 mb-6">
+          <form id="loginForm" class="space-y-3 sm:space-y-4">
+            ${!showLoginForm font-bold text-gray-800 mb-6">
             ${setupFirstUser ? 'Register Super Admin' : 'Login'}
           </h2>
 
@@ -84,28 +89,28 @@ export function LoginPage(isRegistration = false) {
                 id="password" 
                 required
                 minlength="6"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Min. 6 karakter"
-              />
-            </div>
-
-            ${setupFirstUser ? `
+              !showLoginForm ? `
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password</label>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Konfirmasi Password</label>
                 <input 
                   type="password" 
                   id="confirmPassword" 
                   required
                   minlength="6"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Ketik ulang password"
                 />
               </div>
             ` : ''}
 
-            <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+            <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-xs sm:text-sm"></div>
 
             <button 
+              type="submit" 
+              id="submitBtn"
+              class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 sm:py-3 rounded-lg transition duration-200 flex items-center justify-center text-sm sm:text-base"
+            >
+              <span id="btnText">${showLoginForm ? 'Login' : 'Register
               type="submit" 
               id="submitBtn"
               class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-lg transition duration-200 flex items-center justify-center"
@@ -116,12 +121,23 @@ export function LoginPage(isRegistration = false) {
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </button>
-          </form>
-        </div>
-
-        <!-- Footer -->
-        <div class="bg-gray-50 px-6 py-4 text-center text-sm text-gray-600">
-          &copy; 2026 KARTEJI - Karang Taruna Digital
+          </showLoginForm ? `
+            <p class="text-xs sm:text-sm text-gray-600">
+              Belum punya akun? Hubungi administrator.
+            </p>
+          ` : `
+            <p class="text-xs sm:text-sm text-gray-600">
+              Sudah punya akun? <a href="#loginext-gray-600">
+              Belum punya akun? Hubungi administrator.
+            </p>
+          ` : `
+            <p class="text-xs sm:text-sm text-gray-600">
+              Sudah punya akun? <a href="#" id="switchToLogin" class="text-primary-600 hover:underline font-semibold">Login di sini</a>
+            </p>
+          `}
+          <p class="text-xs text-gray-500 mt-2">
+            &copy; 2026 KARTEJI - Karang Taruna Digital
+          </p>
         </div>
       </div>
     </div>
@@ -133,6 +149,13 @@ export function LoginPage(isRegistration = false) {
     const btnText = document.getElementById('btnText');
     const btnSpinner = document.getElementById('btnSpinner');
     const errorMessage = document.getElementById('errorMessage');
+    const switchToLoginBtn = document.getElementById('switchToLogin');
+
+    // Hwindow.location.hash = 'login';
+        // Re-render page in login mode
+        document.getElementById('root').innerHTML = LoginPage(false);
+      });
+    }
 
     if (form) {
       form.addEventListener('submit', async (e) => {
@@ -144,6 +167,11 @@ export function LoginPage(isRegistration = false) {
         // Show loading
         submitBtn.disabled = true;
         btnText.classList.add('hidden');
+        btnSpinner.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
+
+        try {
+          if (!showLoginFormd('hidden');
         btnSpinner.classList.remove('hidden');
         errorMessage.classList.add('hidden');
 
