@@ -25,7 +25,6 @@ export function BankSampahPage() {
       </div>
     </div>
   `;
-}
 
 setTimeout(() => {
   loadDeposits();
