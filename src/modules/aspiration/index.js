@@ -15,37 +15,6 @@ setTimeout(() => {
   document.getElementById('addAspirationBtn').onclick = showAddAspirationModal;
 }, 0);
 
-// Load aspirations from Firebase
-async function loadAspirations() {
-  const listEl = document.getElementById('aspirationList');
-  if (!listEl) return;
-  const snap = await getDocs(collection(db, 'aspiration'));
-  if (snap.empty) {
-    listEl.innerHTML = '<div class="text-center py-8 text-gray-500">Belum ada aspirasi.</div>';
-    return;
-  }
-  listEl.innerHTML = Array.from(snap.docs).map(doc => {
-    const data = doc.data();
-    return `<div class="bg-white rounded-xl shadow p-3 flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-      <div>
-        <div class="font-bold text-blue-700 text-base">${data.title}</div>
-        <div class="text-xs text-gray-500">${data.content}</div>
-        <div class="text-xs text-gray-400">${data.sender || '-'} | ${data.date?.substr(0,10) || ''}</div>
-      </div>
-      <div class="flex gap-2 mt-2 sm:mt-0">
-        <button class="edit-btn px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold" data-id="${doc.id}">Edit</button>
-        <button class="delete-btn px-3 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-semibold" data-id="${doc.id}">Hapus</button>
-      </div>
-    </div>`;
-  }).join('');
-  // Add event listeners
-  listEl.querySelectorAll('.edit-btn').forEach(btn => {
-    btn.onclick = () => showEditAspirationModal(btn.dataset.id);
-  });
-  listEl.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.onclick = () => deleteAspiration(btn.dataset.id);
-  });
-}
 
 // Show add aspiration modal
 function showAddAspirationModal() {
