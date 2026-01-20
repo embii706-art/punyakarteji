@@ -25,7 +25,6 @@ export function UMKMPage() {
       </div>
     </div>
   `;
-}
 
 setTimeout(() => {
   loadUMKM();
