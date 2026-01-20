@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="KARTEJI - Karang Taruna Digital Application">
+  <meta name="theme-color" content="#0ea5e9">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  
+  <title>KARTEJI - Karang Taruna Digital</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* Loading animation */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #0ea5e9;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Smooth scrolling */
+    #app {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Safe area for notch devices */
+    @supports (padding: max(0px)) {
+      header {
+        padding-top: max(12px, env(safe-area-inset-top));
+      }
+      
+      nav {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading" class="flex items-center justify-center h-screen bg-primary-600">
+    <div class="text-center text-white">
+      <div class="loader mx-auto mb-4"></div>
+      <h1 class="text-2xl font-bold">KARTEJI</h1>
+      <p class="text-sm text-primary-100">Loading...</p>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <div id="root"></div>
+
+  <!-- Main App Script -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

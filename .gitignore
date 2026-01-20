@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+.vite/
+*.local
+
+# Environment variables
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Firebase
+.firebase/
+*-debug.log
+
+# Capacitor
+android/
+ios/
+.capacitor/
+
+# Testing & Cache
+coverage/
+.nyc_output/
+.cache/
+*.tmp

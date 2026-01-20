@@ -1,18 +1,192 @@
+// Login and Registration Page
+import { authService } from '../auth/auth.service.js';
 
-import { login } from "../auth/auth.service.js";
-import { renderDashboard } from "./dashboard.js";
+export function LoginPage(isRegistration = false) {
+  // Check if this is first user registration
+  const setupFirstUser = isRegistration;
 
-export function renderLogin(){
- document.getElementById('app').innerHTML=`
- <div class="p-4">
-  <h1 class="text-xl mb-2">Login KARTEJI</h1>
-  <input id="email" class="border p-2 w-full mb-2" placeholder="Email"/>
-  <input id="pass" type="password" class="border p-2 w-full mb-2" placeholder="Password"/>
-  <button id="btn" class="bg-blue-600 text-white p-2 w-full">Login</button>
- </div>`;
+  const html = `
+    <div class="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <!-- Header -->
+        <div class="bg-primary-600 text-white p-6 text-center">
+          <svg class="w-16 h-16 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <h1 class="text-2xl font-bold">KARTEJI</h1>
+          <p class="text-sm text-primary-100">Karang Taruna Digital</p>
+        </div>
 
- document.getElementById('btn').onclick=async()=>{
-  await login(email.value,pass.value);
-  renderDashboard();
- };
+        <!-- Form -->
+        <div class="p-6">
+          ${setupFirstUser ? `
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p class="text-sm text-blue-800">
+                <strong>Setup Administrator</strong><br/>
+                Anda adalah pengguna pertama. Akun Anda akan menjadi Super Admin.
+              </p>
+            </div>
+          ` : ''}
+
+          <h2 class="text-xl font-bold text-gray-800 mb-6">
+            ${setupFirstUser ? 'Register Super Admin' : 'Login'}
+          </h2>
+
+          <form id="loginForm" class="space-y-4">
+            ${setupFirstUser ? `
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Nama lengkap Anda"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nomor HP</label>
+                <input 
+                  type="tel" 
+                  id="phone"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="08xxxxxxxxxx"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
+                <textarea 
+                  id="address"
+                  rows="2"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Alamat lengkap"
+                ></textarea>
+              </div>
+            ` : ''}
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <input 
+                type="email" 
+                id="email" 
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="email@example.com"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <input 
+                type="password" 
+                id="password" 
+                required
+                minlength="6"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Min. 6 karakter"
+              />
+            </div>
+
+            ${setupFirstUser ? `
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password</label>
+                <input 
+                  type="password" 
+                  id="confirmPassword" 
+                  required
+                  minlength="6"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Ketik ulang password"
+                />
+              </div>
+            ` : ''}
+
+            <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+
+            <button 
+              type="submit" 
+              id="submitBtn"
+              class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 rounded-lg transition duration-200 flex items-center justify-center"
+            >
+              <span id="btnText">${setupFirstUser ? 'Register' : 'Login'}</span>
+              <svg id="btnSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 px-6 py-4 text-center text-sm text-gray-600">
+          &copy; 2026 KARTEJI - Karang Taruna Digital
+        </div>
+      </div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Show loading
+        submitBtn.disabled = true;
+        btnText.classList.add('hidden');
+        btnSpinner.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
+
+        try {
+          if (setupFirstUser) {
+            // Registration
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone')?.value || '';
+            const address = document.getElementById('address')?.value || '';
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+              throw new Error('Password tidak cocok');
+            }
+
+            await authService.registerFirstUser(email, password, {
+              name,
+              phone,
+              address
+            });
+
+            // Reload to initialize main app
+            window.location.reload();
+          } else {
+            // Login
+            await authService.login(email, password);
+            
+            // Reload to initialize main app
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Auth error:', error);
+          errorMessage.textContent = error.message || 'Terjadi kesalahan. Silakan coba lagi.';
+          errorMessage.classList.remove('hidden');
+
+          // Reset button
+          submitBtn.disabled = false;
+          btnText.classList.remove('hidden');
+          btnSpinner.classList.add('hidden');
+        }
+      });
+    }
+  }, 0);
+
+  return html;
 }

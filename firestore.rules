@@ -1,0 +1,150 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+    
+    function isSuperAdmin() {
+      return hasRole('super_admin');
+    }
+    
+    function isAdmin() {
+      return isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua');
+    }
+    
+    function isBendahara() {
+      return hasRole('bendahara');
+    }
+    
+    function isActive() {
+      return isAuthenticated() && getUserData().isActive == true;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Anyone authenticated can read their own profile
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      
+      // Only admins can create new users
+      allow create: if isAdmin() || !exists(/databases/$(database)/documents/users/$(userId));
+      
+      // Users can update their own profile, admins can update any
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == userId && 
+         request.resource.data.role == resource.data.role && 
+         request.resource.data.isActive == resource.data.isActive) ||
+        isAdmin()
+      );
+      
+      // Only super admin can delete users
+      allow delete: if isSuperAdmin();
+    }
+
+    // Waste Deposits collection (Bank Sampah)
+    match /waste_deposits/{depositId} {
+      // Anyone authenticated can read
+      allow read: if isAuthenticated() && isActive();
+      
+      // Users with bank_sampah permission can create
+      allow create: if isAuthenticated() && isActive();
+      
+      // Only creator or admin can update/delete
+      allow update, delete: if isAuthenticated() && isActive() && 
+        (request.auth.uid == resource.data.createdBy || isAdmin());
+    }
+
+    // Transactions collection (Finance)
+    match /transactions/{transactionId} {
+      // Anyone authenticated can read
+      allow read: if isAuthenticated() && isActive();
+      
+      // Bendahara and admins can create
+      allow create: if isAuthenticated() && isActive() && (isBendahara() || isAdmin());
+      
+      // Only bendahara can update pending transactions
+      // Ketua/Wakil can approve transactions
+      allow update: if isAuthenticated() && isActive() && (
+        (isBendahara() && resource.data.status == 'pending') ||
+        (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedBy', 'approvedAt']))
+      );
+      
+      // Only super admin can delete
+      allow delete: if isSuperAdmin();
+    }
+
+    // UMKM collection
+    match /umkm/{umkmId} {
+      // Everyone can read (for public catalog)
+      allow read: if true;
+      
+      // Authenticated users with umkm permission can create
+      allow create: if isAuthenticated() && isActive();
+      
+      // Creator or admin can update/delete
+      allow update, delete: if isAuthenticated() && isActive() && 
+        (request.auth.uid == resource.data.createdBy || isAdmin());
+    }
+
+    // Payments collection
+    match /payments/{paymentId} {
+      // Users can read their own payments, admins can read all
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.userId || 
+        isAdmin() || 
+        isBendahara()
+      );
+      
+      // Anyone authenticated can create payment
+      allow create: if isAuthenticated();
+      
+      // Only system (via webhook) or admin can update payment status
+      allow update: if isAdmin() || isBendahara();
+      
+      // Only super admin can delete
+      allow delete: if isSuperAdmin();
+    }
+
+    // Activities log collection
+    match /activities/{activityId} {
+      // Anyone authenticated can read
+      allow read: if isAuthenticated() && isActive();
+      
+      // Only system can create activities
+      allow create: if isAuthenticated();
+      
+      // No updates or deletes allowed
+      allow update, delete: if false;
+    }
+
+    // Aspirations collection
+    match /aspirations/{aspirationId} {
+      // Anyone authenticated can read their own aspirations
+      // Admins (ketua, wakil, sekretaris) can read all
+      allow read: if isAuthenticated() && isActive() && (
+        resource.data.userId == request.auth.uid || isAdmin() || hasRole('sekretaris')
+      );
+      
+      // Any authenticated user can create aspirations
+      allow create: if isAuthenticated() && isActive() && 
+        request.resource.data.userId == request.auth.uid;
+      
+      // Only admins and sekretaris can update aspirations (to change status)
+      allow update: if isAuthenticated() && (isAdmin() || hasRole('sekretaris')) &&
+        request.resource.data.userId == resource.data.userId;
+      
+      // Only super admin can delete aspirations
+      allow delete: if isSuperAdmin();
+    }
+  }
+}

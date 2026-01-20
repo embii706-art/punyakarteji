@@ -1,1 +1,0 @@
-console.log('KARTEJI app started');
