@@ -44,18 +44,27 @@ service cloud.firestore {
       // Anyone authenticated can read their own profile
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
 
-      // User pertama: hanya bisa super_admin
+      /*
+        CREATE USER RULES:
+        1. User pertama (belum ada user):
+           - Hanya bisa register sebagai super_admin
+        2. User berikutnya (sudah ada user):
+           - Siapa saja bisa register mandiri, role harus anggota
+        3. Admin (super_admin, ketua, wakil_ketua):
+           - Bisa membuat user dengan role apapun
+      */
       allow create: if (
+        // 1. User pertama (belum ada user): hanya bisa super_admin
         !exists(/databases/$(database)/documents/users/$(userId)) &&
         get(/databases/$(database)/documents/users).size() == 0 &&
         request.resource.data.role == 'super_admin' && isValidRole(request.resource.data.role)
       ) || (
-        // User berikutnya: siapa saja bisa register, role harus anggota
+        // 2. User berikutnya: siapa saja bisa register mandiri, role harus anggota
         !exists(/databases/$(database)/documents/users/$(userId)) &&
         get(/databases/$(database)/documents/users).size() > 0 &&
         request.resource.data.role == 'anggota' && isValidRole(request.resource.data.role)
       ) || (
-        // Admin (super_admin, ketua, wakil_ketua) bisa create user dengan role apapun
+        // 3. Admin (super_admin, ketua, wakil_ketua) bisa create user dengan role apapun
         (isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua')) && isValidRole(request.resource.data.role)
       );
 
