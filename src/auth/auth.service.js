@@ -40,6 +40,47 @@ export const ROLE_PERMISSIONS = {
 };
 
 class AuthService {
+    /**
+     * Register anggota (user biasa, role: anggota)
+     */
+    async registerAnggota(name, email, password) {
+      try {
+        // Cek apakah email sudah terdaftar
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', email));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          throw new Error('Email sudah terdaftar');
+        }
+        // Buat user auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        // Buat profile user role anggota
+        const userProfile = {
+          email: user.email,
+          role: ROLES.ANGGOTA,
+          name: name || '',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          isActive: true
+        };
+        await setDoc(doc(db, 'users', user.uid), userProfile);
+        this.currentUser = user;
+        this.userProfile = { id: user.uid, ...userProfile };
+        return { user, profile: this.userProfile };
+      } catch (error) {
+        if (error.code === 'auth/email-already-in-use') {
+          throw new Error('Email sudah terdaftar');
+        }
+        if (error.code === 'auth/weak-password') {
+          throw new Error('Password terlalu lemah (min. 6 karakter)');
+        }
+        if (error.code === 'auth/invalid-email') {
+          throw new Error('Format email tidak valid');
+        }
+        throw error;
+      }
+    }
   constructor() {
     this.currentUser = null;
     this.userProfile = null;

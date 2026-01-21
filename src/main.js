@@ -67,33 +67,10 @@ async function initApp() {
     }
 
     if (!user) {
-      // User not logged in - check if users exist
-      // Use cached result if available for faster loading
-      const cachedHasUsers = localStorage.getItem('karteji_has_users');
-      let hasUsers = cachedHasUsers === 'true';
-      
-      if (cachedHasUsers === null) {
-        // First time - need to check
-        // 🔍 Checking for existing users...
-        hasUsers = await authService.hasAnyUser();
-        localStorage.setItem('karteji_has_users', hasUsers.toString());
-      }
-      
-      // 👥 Has users in system: (hidden in production)
-      
-      if (!hasUsers) {
-        // No users in system - show registration
-        // 📝 Showing registration screen (first user)
-        showRegistrationScreen();
-      } else {
-        // Users exist - show login
-        // 🔑 Showing login screen
-        showLoginScreen();
-      }
+      // User not logged in - always show login screen
+      showLoginScreen();
     } else {
       // User logged in - initialize app immediately
-      // ✅ User logged in, initializing main app
-      // Set cache to true since we know users exist
       localStorage.setItem('karteji_has_users', 'true');
       initMainApp();
     }
