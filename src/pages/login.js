@@ -12,109 +12,83 @@ export function LoginPage(isRegistration = false) {
 
   const html = `
     <div class="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-3 sm:p-4">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-primary-100">
         <!-- Header -->
-        <div class="bg-primary-600 text-white p-4 sm:p-6 text-center">
-          <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-500 text-white p-6 text-center relative">
+          <div class="absolute top-4 right-4">
+            <svg class="w-8 h-8 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke-width="2"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2" />
+            </svg>
+          </div>
+          <svg class="w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-2 sm:mb-3 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <h1 class="text-xl sm:text-2xl font-bold">KARTEJI</h1>
-          <p class="text-xs sm:text-sm text-primary-100">Karang Taruna Digital</p>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">KARTEJI</h1>
+          <p class="text-sm sm:text-base text-primary-100 font-medium">Karang Taruna Digital</p>
         </div>
 
         <!-- Form -->
-        <div class="p-4 sm:p-6">
+        <div class="p-6 sm:p-8">
           ${setupFirstUser && !forceLoginMode ? `
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
-              <p class="text-xs sm:text-sm text-blue-800">
-                <strong>Setup Administrator</strong><br/>
-                Anda adalah pengguna pertama. Akun Anda akan menjadi Super Admin.
-              </p>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex items-center gap-3">
+              <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2" /></svg>
+              <div>
+                <div class="font-semibold text-blue-800 text-sm">Setup Administrator</div>
+                <div class="text-xs text-blue-700">Anda adalah pengguna pertama. Akun Anda akan menjadi <b>Super Admin</b>.</div>
+              </div>
             </div>
           ` : ''}
 
-          <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6">
-            ${showLoginForm ? 'Login' : 'Register Super Admin'}
+          ${!showLoginForm ? `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              <span class="text-xs text-green-700">Pendaftaran anggota: role otomatis <b>anggota</b>.</span>
+            </div>
+          ` : ''}
+
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-6 text-center">
+            ${showLoginForm ? 'Login' : (setupFirstUser ? 'Register Super Admin' : 'Register Anggota')}
           </h2>
 
-          <form id="loginForm" class="space-y-3 sm:space-y-4">
+          <form id="loginForm" class="space-y-4">
             ${!showLoginForm ? `
-              <div>
-                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Nama Lengkap</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  required
-                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Nama lengkap Anda"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Nomor HP</label>
-                <input 
-                  type="tel" 
-                  id="phone"
-                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="08xxxxxxxxxx"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Alamat</label>
-                <textarea 
-                  id="address"
-                  rows="2"
-                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Alamat lengkap"
-                ></textarea>
+              <div class="grid grid-cols-1 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                  <input type="text" id="name" required class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Nama lengkap Anda" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Nomor HP</label>
+                  <input type="tel" id="phone" class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="08xxxxxxxxxx" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                  <textarea id="address" rows="2" class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Alamat lengkap"></textarea>
+                </div>
               </div>
             ` : ''}
 
             <div>
-              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Email</label>
-              <input 
-                type="email" 
-                id="email" 
-                required
-                class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="email@example.com"
-              />
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input type="email" id="email" required class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="email@example.com" />
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Password</label>
-              <input 
-                type="password" 
-                id="password" 
-                required
-                minlength="6"
-                class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Min. 6 karakter"
-              />
+              <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input type="password" id="password" required minlength="6" class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Min. 6 karakter" />
             </div>
 
             ${!showLoginForm ? `
               <div>
-                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Konfirmasi Password</label>
-                <input 
-                  type="password" 
-                  id="confirmPassword" 
-                  required
-                  minlength="6"
-                  class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Ketik ulang password"
-                />
+                <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
+                <input type="password" id="confirmPassword" required minlength="6" class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Ketik ulang password" />
               </div>
             ` : ''}
 
-            <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-xs sm:text-sm"></div>
+            <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm"></div>
 
-            <button 
-              type="submit" 
-              id="submitBtn"
-              class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 sm:py-3 rounded-lg transition duration-200 flex items-center justify-center text-sm sm:text-base"
-            >
+            <button type="submit" id="submitBtn" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl transition duration-200 flex items-center justify-center text-base shadow-md hover:shadow-lg">
               <span id="btnText">${showLoginForm ? 'Login' : 'Register'}</span>
               <svg id="btnSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -122,12 +96,28 @@ export function LoginPage(isRegistration = false) {
               </svg>
             </button>
           </form>
+
+          <div class="my-6 flex items-center gap-2">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span class="text-xs text-gray-400 font-semibold">atau</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+          </div>
+
+          <div class="text-center">
+            ${showLoginForm ? `
+              <p class="text-sm text-gray-600">Belum punya akun? <span class="font-semibold text-primary-600">Daftar sebagai anggota</span> di bawah form ini.</p>
+            ` : `
+              <p class="text-sm text-gray-600">Sudah punya akun? <a href="#login" id="switchToLogin" class="text-primary-600 hover:underline font-semibold">Login di sini</a></p>
+            `}
+          </div>
         </div>
 
         <!-- Footer -->
-        <div class="bg-gray-50 px-4 sm:px-6 py-4 text-center">
-          ${showLoginForm ? `
-            <p class="text-xs sm:text-sm text-gray-600">
+        <div class="bg-gray-50 px-6 py-4 text-center border-t border-gray-100">
+          <p class="text-xs text-gray-500 mt-2">&copy; 2026 KARTEJI - Karang Taruna Digital</p>
+        </div>
+      </div>
+    </div>
               Belum punya akun? Hubungi administrator.
             </p>
           ` : `
@@ -157,11 +147,25 @@ export function LoginPage(isRegistration = false) {
         e.preventDefault();
         // Switching to login mode
         window.location.hash = 'login';
-        // Re-render page in login mode
+          // Cek apakah user pertama (belum ada user di Firestore)
+          const setupFirstUser = isRegistration;
         document.getElementById('root').innerHTML = LoginPage(false);
       });
     }
+          // Jika setupFirstUser true dan belum ada user, tampilkan register super_admin
+          // Jika sudah ada user, tampilkan register anggota (mode register)
+          let showLoginForm = !setupFirstUser || forceLoginMode;
 
+          // Cek cache has_users
+          let hasUsers = false;
+          try {
+            hasUsers = localStorage.getItem('karteji_has_users') === 'true';
+          } catch {}
+
+          // Jika sudah ada user, mode register anggota
+          if (!showLoginForm && hasUsers) {
+            // Register anggota
+            showLoginForm = false;
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();

@@ -47,14 +47,14 @@ service cloud.firestore {
       /*
         CREATE USER RULES:
         1. User pertama (belum ada user):
-           - Hanya bisa register sebagai super_admin
+           - WAJIB register sebagai super_admin
         2. User berikutnya (sudah ada user):
            - Siapa saja bisa register mandiri, role harus anggota
         3. Admin (super_admin, ketua, wakil_ketua):
            - Bisa membuat user dengan role apapun
       */
       allow create: if (
-        // 1. User pertama (belum ada user): hanya bisa super_admin
+        // 1. User pertama (belum ada user): WAJIB super_admin
         !exists(/databases/$(database)/documents/users/$(userId)) &&
         get(/databases/$(database)/documents/users).size() == 0 &&
         request.resource.data.role == 'super_admin' && isValidRole(request.resource.data.role)
