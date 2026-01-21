@@ -317,6 +317,14 @@ async function loadDashboardData() {
     loadRecentActivities();
   } catch (error) {
     // Error loading dashboard data:
+    const statsEl = document.getElementById('dashboardStats');
+    if (statsEl) {
+      statsEl.innerHTML = `<div class="col-span-2 text-center text-red-500 py-8">Gagal memuat data dashboard.<br>${error.message || 'Cek koneksi dan akses Firestore.'}</div>`;
+    }
+    const activitiesDiv = document.getElementById('recentActivities');
+    if (activitiesDiv) {
+      activitiesDiv.innerHTML = `<div class="text-center text-red-500 py-4">Tidak bisa memuat aktivitas.<br>${error.message || 'Cek akses Firestore.'}</div>`;
+    }
   }
 }
 
