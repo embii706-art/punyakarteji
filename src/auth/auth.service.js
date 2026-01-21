@@ -52,13 +52,16 @@ class AuthService {
         if (!snapshot.empty) {
           throw new Error('Email sudah terdaftar');
         }
+        // Cek apakah ini user pertama
+        const allUsersSnap = await getDocs(usersRef);
+        const isFirstUser = allUsersSnap.empty;
         // Buat user auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        // Buat profile user role anggota
+        // Buat profile user, role super_admin jika user pertama, anggota jika bukan
         const userProfile = {
           email: user.email,
-          role: ROLES.ANGGOTA,
+          role: isFirstUser ? ROLES.SUPER_ADMIN : ROLES.ANGGOTA,
           name: name || '',
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
