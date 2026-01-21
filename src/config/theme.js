@@ -1,3 +1,4 @@
+import { getSpecialTheme } from './specialTheme.js';
 // Theme Management System
 // Supports Dark and Light modes with localStorage persistence
 
