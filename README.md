@@ -1,10 +1,11 @@
-# KARTEJI - Karang Taruna Digital
+
+# KARTEJI - Karang Taruna Digital v2.0.0
 
 > **Production-ready PWA** untuk manajemen Karang Taruna dengan dukungan mobile (Android & iOS)
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Firebase](https://img.shields.io/badge/Firebase-10.7.1-orange.svg)
 ![Capacitor](https://img.shields.io/badge/Capacitor-5.5.1-blue.svg)

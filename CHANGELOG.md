@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.0.0] - 2026-01-21
+- Update: All features and UI to v2.0.0
+
 All notable changes to KARTEJI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
