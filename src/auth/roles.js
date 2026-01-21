@@ -1,5 +1,4 @@
 // RBAC Helper untuk pengecekan role & permission konsisten di seluruh modul
-import { ROLES } from './auth.service.js';
 
 export const PERMISSIONS = {
   VIEW_DASHBOARD: 'view_dashboard',
@@ -39,15 +38,6 @@ export function isAdmin(role) {
 // Roles and Permissions for KARTEJI
 // FIXED roles - cannot be deleted or modified
 
-export const ROLES = {
-  SUPER_ADMIN: 'super_admin',
-  KETUA: 'ketua',
-  WAKIL_KETUA: 'wakil_ketua',
-  BENDAHARA: 'bendahara',
-  SEKRETARIS: 'sekretaris',
-  HUMAS: 'humas',
-  ANGGOTA: 'anggota'
-};
 
 // Role labels for display
 export const ROLE_LABELS = {

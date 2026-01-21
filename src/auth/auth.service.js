@@ -16,29 +16,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase.js';
-import { hasPermission, isAdmin } from './roles.js';
-
-// Define roles (FIXED - cannot be deleted)
-export const ROLES = {
-  SUPER_ADMIN: 'super_admin',
-  KETUA: 'ketua',
-  WAKIL_KETUA: 'wakil_ketua',
-  BENDAHARA: 'bendahara',
-  SEKRETARIS: 'sekretaris',
-  HUMAS: 'humas',
-  ANGGOTA: 'anggota'
-};
-
-// Role permissions
-export const ROLE_PERMISSIONS = {
-  [ROLES.SUPER_ADMIN]: ['*'], // All permissions
-  [ROLES.KETUA]: ['dashboard', 'members', 'bank_sampah', 'finance', 'umkm', 'approve', 'view_all'],
-  [ROLES.WAKIL_KETUA]: ['dashboard', 'members', 'bank_sampah', 'finance', 'umkm', 'approve', 'view_all'],
-  [ROLES.BENDAHARA]: ['dashboard', 'finance', 'bank_sampah', 'create_transaction', 'view_all'],
-  [ROLES.SEKRETARIS]: ['dashboard', 'members', 'bank_sampah', 'umkm', 'view_all'],
-  [ROLES.HUMAS]: ['dashboard', 'umkm', 'view_public'],
-  [ROLES.ANGGOTA]: ['dashboard', 'profile', 'view_own']
-};
+import { hasPermission, isAdmin, ROLES, ROLE_PERMISSIONS } from './roles.js';
 
 class AuthService {
     /**
