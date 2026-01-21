@@ -1,9 +1,11 @@
 // Finance Module with Approval Flow
 import { authService } from '../../auth/auth.service.js';
+import { hasPermission, isAdmin, PERMISSIONS } from '../../auth/roles.js';
 
 export function FinancePage() {
-  const isAdmin = authService.isAdmin();
-  const isBendahara = authService.hasRole('bendahara');
+  const profile = authService.getUserProfile();
+  const isAdminRole = profile ? isAdmin(profile.role) : false;
+  const isBendahara = profile ? profile.role === 'bendahara' : false;
 
   return `
     <div class="bg-gray-50 min-h-screen pb-20">
@@ -18,7 +20,7 @@ export function FinancePage() {
           <p class="text-3xl font-bold text-gray-800" id="saldoKas">Rp 0</p>
         </div>
 
-        ${(isBendahara || isAdmin) ? `
+        ${ (isBendahara || isAdminRole) ? `
         <button 
           id="addTransactionBtn"
           class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 rounded-lg mb-4"
@@ -107,7 +109,10 @@ async function showEditTransactionModal(id) {
   if (snap.empty) return;
   const data = snap.docs[0].data();
   // Hanya bendahara boleh update data transaksi (selain approval)
-  if (authService.hasRole('bendahara')) {
+  const profile = authService.getUserProfile();
+  const isBendahara = profile ? profile.role === 'bendahara' : false;
+  const isAdminRole = profile ? isAdmin(profile.role) : false;
+  if (isBendahara) {
     const description = prompt('Edit deskripsi:', data.description);
     if (!description) return;
     const amount = prompt('Edit jumlah (Rp):', data.amount);
@@ -115,7 +120,7 @@ async function showEditTransactionModal(id) {
     const type = prompt('Edit tipe (masuk/keluar):', data.type);
     const date = prompt('Edit tanggal (YYYY-MM-DD):', data.date);
     await updateDoc(docRef, { description, amount: parseInt(amount), type, date });
-  } else if (authService.isAdmin()) {
+  } else if (isAdminRole) {
     // Admin hanya boleh update status approval
     const status = prompt('Update status (pending/approved/rejected):', data.status);
     if (!status) return;

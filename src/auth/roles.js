@@ -1,3 +1,41 @@
+// RBAC Helper untuk pengecekan role & permission konsisten di seluruh modul
+import { ROLES } from './auth.service.js';
+
+export const PERMISSIONS = {
+  VIEW_DASHBOARD: 'view_dashboard',
+  VIEW_ALL_DATA: 'view_all_data',
+  VIEW_MEMBERS: 'view_members',
+  CREATE_MEMBER: 'create_member',
+  EDIT_MEMBER: 'edit_member',
+  DELETE_MEMBER: 'delete_member',
+  MANAGE_ROLES: 'manage_roles',
+  BANK_SAMPAH: 'bank_sampah',
+  FINANCE: 'finance',
+  CREATE_TRANSACTION: 'create_transaction',
+  APPROVE_TRANSACTION: 'approve_transaction',
+  MANAGE_UMKM: 'manage_umkm',
+  MANAGE_ASPIRATIONS: 'manage_aspirations',
+  // ... tambahkan sesuai kebutuhan
+};
+
+export const ROLE_PERMISSIONS = {
+  [ROLES.SUPER_ADMIN]: ['*'],
+  [ROLES.KETUA]: [PERMISSIONS.VIEW_DASHBOARD, PERMISSIONS.VIEW_MEMBERS, PERMISSIONS.BANK_SAMPAH, PERMISSIONS.FINANCE, PERMISSIONS.APPROVE_TRANSACTION, PERMISSIONS.MANAGE_ROLES, PERMISSIONS.MANAGE_ASPIRATIONS],
+  [ROLES.WAKIL_KETUA]: [PERMISSIONS.VIEW_DASHBOARD, PERMISSIONS.VIEW_MEMBERS, PERMISSIONS.BANK_SAMPAH, PERMISSIONS.FINANCE, PERMISSIONS.APPROVE_TRANSACTION, PERMISSIONS.MANAGE_ROLES],
+  [ROLES.BENDAHARA]: [PERMISSIONS.VIEW_DASHBOARD, PERMISSIONS.FINANCE, PERMISSIONS.BANK_SAMPAH, PERMISSIONS.CREATE_TRANSACTION],
+  [ROLES.SEKRETARIS]: [PERMISSIONS.VIEW_DASHBOARD, PERMISSIONS.VIEW_MEMBERS, PERMISSIONS.BANK_SAMPAH, PERMISSIONS.MANAGE_ASPIRATIONS],
+  [ROLES.HUMAS]: [PERMISSIONS.VIEW_DASHBOARD, PERMISSIONS.MANAGE_UMKM],
+  [ROLES.ANGGOTA]: [PERMISSIONS.VIEW_DASHBOARD],
+};
+
+export function hasPermission(role, permission) {
+  const perms = ROLE_PERMISSIONS[role] || [];
+  return perms.includes('*') || perms.includes(permission);
+}
+
+export function isAdmin(role) {
+  return [ROLES.SUPER_ADMIN, ROLES.KETUA, ROLES.WAKIL_KETUA].includes(role);
+}
 // Roles and Permissions for KARTEJI
 // FIXED roles - cannot be deleted or modified
 

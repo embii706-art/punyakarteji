@@ -1,6 +1,6 @@
 // Kotak Aspirasi (Aspiration Box) Module
 import { authService } from '../../auth/auth.service.js';
-import { PERMISSIONS } from '../../auth/roles.js';
+import { PERMISSIONS, hasPermission } from '../../auth/roles.js';
 
 import { 
   collection, 
@@ -92,7 +92,7 @@ const STATUS_COLORS = {
 
 export function AspirationPage() {
   const profile = authService.getUserProfile();
-  const canManage = authService.hasPermission(PERMISSIONS.MANAGE_ASPIRATIONS);
+  const canManage = profile ? hasPermission(profile.role, PERMISSIONS.MANAGE_ASPIRATIONS) : false;
 
   const html = `
     <div class="bg-gray-50 min-h-screen pb-20">
@@ -259,7 +259,8 @@ let currentAspirations = [];
 
 async function loadAspirations() {
   try {
-    const canManage = authService.hasPermission(PERMISSIONS.MANAGE_ASPIRATIONS);
+    const profile = authService.getUserProfile();
+    const canManage = profile ? hasPermission(profile.role, PERMISSIONS.MANAGE_ASPIRATIONS) : false;
     const userId = authService.getCurrentUser()?.uid;
 
     let q;
@@ -308,7 +309,8 @@ async function loadAspirations() {
 }
 
 function renderAspirations() {
-  const canManage = authService.hasPermission(PERMISSIONS.MANAGE_ASPIRATIONS);
+  const profile = authService.getUserProfile();
+  const canManage = profile ? hasPermission(profile.role, PERMISSIONS.MANAGE_ASPIRATIONS) : false;
   const list = document.getElementById('aspirationsList');
 
   let filtered = currentAspirations;
@@ -374,7 +376,8 @@ function createAspirationCard(aspiration, canManage) {
 }
 
 function setupHandlers() {
-  const canManage = authService.hasPermission(PERMISSIONS.MANAGE_ASPIRATIONS);
+  const profile = authService.getUserProfile();
+  const canManage = profile ? hasPermission(profile.role, PERMISSIONS.MANAGE_ASPIRATIONS) : false;
 
   // Submit modal
   window.showSubmitModal = () => {

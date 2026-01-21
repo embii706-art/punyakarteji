@@ -1,5 +1,6 @@
 // UMKM Module with Cloudinary Integration
 import { authService } from '../../auth/auth.service.js';
+import { hasPermission, PERMISSIONS } from '../../auth/roles.js';
 
 export function UMKMPage() {
   return `
@@ -65,6 +66,11 @@ async function loadUMKM() {
 
 // Show add UMKM modal
 function showAddUMKMModal() {
+  const profile = authService.getUserProfile();
+  if (!profile || !hasPermission(profile.role, PERMISSIONS.MANAGE_UMKM)) {
+    alert('Permission denied');
+    return;
+  }
   const name = prompt('Nama produk:');
   if (!name) return;
   const description = prompt('Deskripsi produk:');
@@ -89,6 +95,11 @@ async function showEditUMKMModal(id) {
   const snap = await getDocs(query(collection(db, 'umkm'), where('__name__', '==', id)));
   if (snap.empty) return;
   const data = snap.docs[0].data();
+  const profile = authService.getUserProfile();
+  if (!profile || !hasPermission(profile.role, PERMISSIONS.MANAGE_UMKM)) {
+    alert('Permission denied');
+    return;
+  }
   const name = prompt('Edit nama produk:', data.name);
   if (!name) return;
   const description = prompt('Edit deskripsi:', data.description);
@@ -101,6 +112,11 @@ async function showEditUMKMModal(id) {
 
 // Delete UMKM product from Firebase
 async function deleteUMKM(id) {
+  const profile = authService.getUserProfile();
+  if (!profile || !hasPermission(profile.role, PERMISSIONS.MANAGE_UMKM)) {
+    alert('Permission denied');
+    return;
+  }
   if (!confirm('Yakin ingin menghapus produk ini?')) return;
   await updateDoc(doc(db, 'umkm', id), { deleted: true });
   loadUMKM();

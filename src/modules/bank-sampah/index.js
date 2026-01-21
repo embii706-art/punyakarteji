@@ -1,5 +1,6 @@
 // Bank Sampah Module with Offline Support
 import { authService } from '../../auth/auth.service.js';
+import { hasPermission, PERMISSIONS } from '../../auth/roles.js';
 
 export function BankSampahPage() {
   return `
@@ -84,6 +85,11 @@ async function showAddDepositModal() {
 // Add deposit to Firebase
 async function addDeposit(data) {
   const user = authService.getCurrentUser();
+  const profile = authService.getUserProfile();
+  if (!profile || !hasPermission(profile.role, PERMISSIONS.BANK_SAMPAH)) {
+    alert('Permission denied');
+    return;
+  }
   await addDoc(collection(db, 'bank_sampah'), {
     ...data,
     createdBy: user?.uid || '',
@@ -98,6 +104,11 @@ async function showEditDepositModal(id) {
   const snap = await getDocs(query(collection(db, 'bank_sampah'), where('__name__', '==', id)));
   if (snap.empty) return;
   const data = snap.docs[0].data();
+  const profile = authService.getUserProfile();
+  if (!profile || !hasPermission(profile.role, PERMISSIONS.BANK_SAMPAH)) {
+    alert('Permission denied');
+    return;
+  }
   const amount = prompt('Edit jumlah sampah (kg):', data.amount);
   if (!amount) return;
   const type = prompt('Edit jenis sampah:', data.type);
@@ -108,6 +119,11 @@ async function showEditDepositModal(id) {
 
 // Delete deposit from Firebase
 async function deleteDeposit(id) {
+  const profile = authService.getUserProfile();
+  if (!profile || !hasPermission(profile.role, PERMISSIONS.BANK_SAMPAH)) {
+    alert('Permission denied');
+    return;
+  }
   if (!confirm('Yakin ingin menghapus setoran ini?')) return;
   await updateDoc(doc(db, 'bank_sampah', id), { deleted: true });
   loadDeposits();

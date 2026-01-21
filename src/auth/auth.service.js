@@ -16,6 +16,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase.js';
+import { hasPermission, isAdmin } from './roles.js';
 
 // Define roles (FIXED - cannot be deleted)
 export const ROLES = {
@@ -314,13 +315,10 @@ class AuthService {
   /**
    * Check if user has permission
    */
+
   hasPermission(permission) {
     if (!this.userProfile) return false;
-    
-    const role = this.userProfile.role;
-    const permissions = ROLE_PERMISSIONS[role] || [];
-    
-    return permissions.includes('*') || permissions.includes(permission);
+    return hasPermission(this.userProfile.role, permission);
   }
 
   /**
@@ -334,9 +332,10 @@ class AuthService {
   /**
    * Check if user is admin (super_admin, ketua, or wakil_ketua)
    */
+
   isAdmin() {
     if (!this.userProfile) return false;
-    return [ROLES.SUPER_ADMIN, ROLES.KETUA, ROLES.WAKIL_KETUA].includes(this.userProfile.role);
+    return isAdmin(this.userProfile.role);
   }
 
   /**
