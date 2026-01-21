@@ -9,18 +9,19 @@ import { authService } from './auth.service.js';
 export function authGuard(next, redirectFn) {
   const user = authService.getCurrentUser();
   const profile = authService.getUserProfile();
+  const currentPath = window.location.pathname;
 
   if (user && profile) {
     // Check if user is active
     if (!profile.isActive) {
       authService.logout();
-      redirectFn('/login');
+      if (currentPath !== '/login') redirectFn('/login');
       return false;
     }
     next();
     return true;
   } else {
-    redirectFn('/login');
+    if (currentPath !== '/login') redirectFn('/login');
     return false;
   }
 }
