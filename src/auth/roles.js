@@ -1,3 +1,14 @@
+// Roles and Permissions for KARTEJI
+// FIXED roles - cannot be deleted or modified
+export const ROLES = {
+  SUPER_ADMIN: 'super_admin',
+  KETUA: 'ketua',
+  WAKIL_KETUA: 'wakil_ketua',
+  BENDAHARA: 'bendahara',
+  SEKRETARIS: 'sekretaris',
+  HUMAS: 'humas',
+  ANGGOTA: 'anggota'
+};
 // RBAC Helper untuk pengecekan role & permission konsisten di seluruh modul
 
 export function hasPermission(role, permission) {
