@@ -244,3 +244,5 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+console.log("initApp called");
+console.log("authService.init resolved");

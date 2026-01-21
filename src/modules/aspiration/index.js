@@ -1,18 +1,24 @@
 // Kotak Aspirasi (Aspiration Box) Module
 import { authService } from '../../auth/auth.service.js';
 import { PERMISSIONS } from '../../auth/roles.js';
+
 import { 
   collection, 
   addDoc, 
   getDocs, 
   updateDoc,
-  doc
+  doc,
+  query,
+  where,
+  orderBy
 } from 'firebase/firestore';
+
 
 
 setTimeout(() => {
   loadAspirations();
-  document.getElementById('addAspirationBtn').onclick = showAddAspirationModal;
+  const btn = document.getElementById('addAspirationBtn');
+  if (btn) btn.onclick = showAddAspirationModal;
 }, 0);
 
 
@@ -64,6 +70,13 @@ async function deleteAspiration(id) {
     UMKM: 'UMKM',
     LAIN: 'Lain-lain'
   };
+
+
+const ASPIRATION_STATUS = {
+  BARU: 'baru',
+  DIPROSES: 'diproses',
+  SELESAI: 'selesai'
+};
 
 const STATUS_LABELS = {
   [ASPIRATION_STATUS.BARU]: 'Baru',
@@ -285,7 +298,8 @@ async function loadAspirations() {
     renderAspirations();
   } catch (error) {
     console.error('Error loading aspirations:', error);
-    document.getElementById('aspirationsList').innerHTML = `
+    const list = document.getElementById('aspirationsList');
+    if (list) list.innerHTML = `
       <div class="text-center py-8 text-red-500">
         Gagal memuat aspirasi
       </div>
@@ -303,7 +317,7 @@ function renderAspirations() {
   }
 
   if (filtered.length === 0) {
-    list.innerHTML = `
+    if (list) list.innerHTML = `
       <div class="text-center py-8 text-gray-500">
         <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -319,7 +333,7 @@ function renderAspirations() {
     html += createAspirationCard(aspiration, canManage);
   });
 
-  list.innerHTML = html;
+  if (list) list.innerHTML = html;
 }
 
 function createAspirationCard(aspiration, canManage) {
@@ -404,7 +418,8 @@ function setupHandlers() {
 
       const author = aspiration.anonymous ? 'Anonim' : (aspiration.userName || 'User');
 
-      document.getElementById('detailContent').innerHTML = `
+      const detailContent = document.getElementById('detailContent');
+      if (detailContent) detailContent.innerHTML = `
         <div class="space-y-4">
           <div>
             <label class="text-xs text-gray-600">Dari</label>
