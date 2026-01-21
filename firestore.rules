@@ -34,20 +34,43 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
+      // Valid roles
+      function isValidRole(role) {
+        return role in [
+          'super_admin', 'ketua', 'wakil_ketua', 'bendahara', 'sekretaris', 'humas', 'anggota'
+        ];
+      }
+
       // Anyone authenticated can read their own profile
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      
-      // Only admins can create new users
-      allow create: if isAdmin() || !exists(/databases/$(database)/documents/users/$(userId));
-      
-      // Users can update their own profile, admins can update any
-      allow update: if isAuthenticated() && (
-        (request.auth.uid == userId && 
-         request.resource.data.role == resource.data.role && 
-         request.resource.data.isActive == resource.data.isActive) ||
-        isAdmin()
+
+      // User pertama: hanya bisa super_admin
+      allow create: if (
+        !exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users).size() == 0 &&
+        request.resource.data.role == 'super_admin' && isValidRole(request.resource.data.role)
+      ) || (
+        // User berikutnya: siapa saja bisa register, role harus anggota
+        !exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users).size() > 0 &&
+        request.resource.data.role == 'anggota' && isValidRole(request.resource.data.role)
+      ) || (
+        // Admin (super_admin, ketua, wakil_ketua) bisa create user dengan role apapun
+        (isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua')) && isValidRole(request.resource.data.role)
       );
-      
+
+      // Users can update their own profile (kecuali field role), role hanya bisa diubah oleh super_admin, ketua, wakil_ketua
+      allow update: if isAuthenticated() && (
+        (
+          request.auth.uid == userId &&
+          request.resource.data.role == resource.data.role &&
+          request.resource.data.isActive == resource.data.isActive
+        ) ||
+        (
+          (isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua')) && isValidRole(request.resource.data.role)
+        )
+      );
+
       // Only super admin can delete users
       allow delete: if isSuperAdmin();
     }
