@@ -106,13 +106,21 @@ async function showEditTransactionModal(id) {
   const snap = await getDocs(query(collection(db, 'keuangan'), where('__name__', '==', id)));
   if (snap.empty) return;
   const data = snap.docs[0].data();
-  const description = prompt('Edit deskripsi:', data.description);
-  if (!description) return;
-  const amount = prompt('Edit jumlah (Rp):', data.amount);
-  if (!amount) return;
-  const type = prompt('Edit tipe (masuk/keluar):', data.type);
-  const date = prompt('Edit tanggal (YYYY-MM-DD):', data.date);
-  await updateDoc(docRef, { description, amount: parseInt(amount), type, date });
+  // Hanya bendahara boleh update data transaksi (selain approval)
+  if (authService.hasRole('bendahara')) {
+    const description = prompt('Edit deskripsi:', data.description);
+    if (!description) return;
+    const amount = prompt('Edit jumlah (Rp):', data.amount);
+    if (!amount) return;
+    const type = prompt('Edit tipe (masuk/keluar):', data.type);
+    const date = prompt('Edit tanggal (YYYY-MM-DD):', data.date);
+    await updateDoc(docRef, { description, amount: parseInt(amount), type, date });
+  } else if (authService.isAdmin()) {
+    // Admin hanya boleh update status approval
+    const status = prompt('Update status (pending/approved/rejected):', data.status);
+    if (!status) return;
+    await updateDoc(docRef, { status });
+  }
   loadTransactions();
 }
 

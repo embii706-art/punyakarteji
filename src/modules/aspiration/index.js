@@ -486,7 +486,7 @@ function setupHandlers() {
           notes,
           updatedAt: serverTimestamp(),
           updatedBy: authService.getCurrentUser().uid
-        });
+        }); // hanya field yang diizinkan rules
 
         alert('Aspirasi berhasil diperbarui!');
         window.closeDetailModal();
@@ -531,7 +531,7 @@ function setupHandlers() {
           anonymous,
           status: 'baru',
           createdAt: serverTimestamp()
-        });
+        }); // userId wajib sesuai auth.uid
 
         alert('Aspirasi berhasil dikirim!');
         window.closeSubmitModal();

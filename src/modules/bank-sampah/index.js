@@ -83,8 +83,10 @@ async function showAddDepositModal() {
 
 // Add deposit to Firebase
 async function addDeposit(data) {
+  const user = authService.getCurrentUser();
   await addDoc(collection(db, 'bank_sampah'), {
     ...data,
+    createdBy: user?.uid || '',
     createdAt: new Date().toISOString()
   });
   loadDeposits();

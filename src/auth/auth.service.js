@@ -70,6 +70,12 @@ class AuthService {
           isActive: true
         };
         await setDoc(doc(db, 'users', user.uid), userProfile);
+        // Jika user pertama (super_admin), buat dokumen /config/app
+        if (isFirstUser) {
+          try {
+            await setDoc(doc(db, 'config', 'app'), { hasSuperAdmin: true }, { merge: true });
+          } catch (e) { /* ignore */ }
+        }
         this.currentUser = user;
         this.userProfile = { id: user.uid, ...userProfile };
         return { user, profile: this.userProfile };

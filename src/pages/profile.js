@@ -147,8 +147,61 @@ export function ProfilePage() {
       }
     };
 
+
     window.editProfile = () => {
-      alert('Fitur edit profile akan segera hadir!');
+      const profile = authService.getUserProfile();
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/40';
+      modal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative">
+          <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" onclick="this.closest('.fixed').remove()">&times;</button>
+          <h2 class="text-xl font-bold mb-4">Edit Profil</h2>
+          <form id="editProfileForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+              <input type="text" id="editName" value="${profile?.name || ''}" required class="w-full px-4 py-3 border rounded-xl" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nomor HP</label>
+              <input type="tel" id="editPhone" value="${profile?.phone || ''}" class="w-full px-4 py-3 border rounded-xl" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+              <textarea id="editAddress" rows="2" class="w-full px-4 py-3 border rounded-xl">${profile?.address || ''}</textarea>
+            </div>
+            <div id="editProfileError" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-xl text-sm"></div>
+            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl">Simpan</button>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      setTimeout(() => {
+        const form = document.getElementById('editProfileForm');
+        const errorDiv = document.getElementById('editProfileError');
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          errorDiv.classList.add('hidden');
+          const name = document.getElementById('editName').value.trim();
+          const phone = document.getElementById('editPhone').value.trim();
+          const address = document.getElementById('editAddress').value.trim();
+          try {
+            const user = authService.getCurrentUser();
+            if (!user) throw new Error('User tidak ditemukan');
+            await updateDoc(doc(db, 'users', user.uid), {
+              name,
+              phone,
+              address,
+              updatedAt: new Date()
+            });
+            modal.remove();
+            window.location.reload();
+          } catch (err) {
+            errorDiv.textContent = err.message || 'Gagal update profil';
+            errorDiv.classList.remove('hidden');
+          }
+        });
+      }, 0);
     };
 
     window.showAbout = () => {
