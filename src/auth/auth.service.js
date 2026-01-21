@@ -43,7 +43,7 @@ class AuthService {
     /**
      * Register anggota (user biasa, role: anggota)
      */
-    async registerAnggota(name, email, password) {
+    async registerAnggota(name, email, password, phone = '', address = '') {
       try {
         // Cek apakah email sudah terdaftar
         const usersRef = collection(db, 'users');
@@ -63,6 +63,8 @@ class AuthService {
           email: user.email,
           role: isFirstUser ? ROLES.SUPER_ADMIN : ROLES.ANGGOTA,
           name: name || '',
+          phone: phone || '',
+          address: address || '',
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
           isActive: true
