@@ -3,7 +3,7 @@ import { authService } from '../auth/auth.service.js';
 
 export function LoginPage(isRegistration = false) {
   // Mode: true = login, false = register
-  let showLoginForm = isRegistration ? false : true;
+  let showLoginForm = !isRegistration ? true : false;
 
   const html = `
     <div class="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-3 sm:p-4">
@@ -87,13 +87,13 @@ export function LoginPage(isRegistration = false) {
     if (showRegisterBtn) {
       showRegisterBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        document.getElementById('root').innerHTML = LoginPage(false);
+        document.getElementById('root').innerHTML = LoginPage(true);
       });
     }
     if (showLoginBtn) {
       showLoginBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        document.getElementById('root').innerHTML = LoginPage(true);
+        document.getElementById('root').innerHTML = LoginPage(false);
       });
     }
     // Login form
