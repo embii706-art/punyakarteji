@@ -34,19 +34,20 @@ export function authGuard(next, redirectFn) {
  */
 export function roleGuard(allowedRoles, next, redirectFn) {
   const profile = authService.getUserProfile();
+  const currentPath = window.location.pathname;
 
   if (!profile) {
-    redirectFn('/login');
+    if (currentPath !== '/login') redirectFn('/login');
     return false;
   }
 
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
-  
+
   if (roles.includes(profile.role)) {
     next();
     return true;
   } else {
-    redirectFn('/dashboard');
+    if (currentPath !== '/dashboard') redirectFn('/dashboard');
     return false;
   }
 }
@@ -58,11 +59,12 @@ export function roleGuard(allowedRoles, next, redirectFn) {
  * @param {Function} redirectFn - Function to call if not authorized
  */
 export function permissionGuard(permission, next, redirectFn) {
+  const currentPath = window.location.pathname;
   if (authService.hasPermission(permission)) {
     next();
     return true;
   } else {
-    redirectFn('/dashboard');
+    if (currentPath !== '/dashboard') redirectFn('/dashboard');
     return false;
   }
 }
@@ -74,12 +76,13 @@ export function permissionGuard(permission, next, redirectFn) {
  */
 export function guestGuard(next, redirectFn) {
   const user = authService.getCurrentUser();
+  const currentPath = window.location.pathname;
 
   if (!user) {
     next();
     return true;
   } else {
-    redirectFn('/dashboard');
+    if (currentPath !== '/dashboard') redirectFn('/dashboard');
     return false;
   }
 }
