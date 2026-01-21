@@ -161,19 +161,36 @@ export function MembersPage() {
   return html;
 }
 
-async function loadMembers() {
+let lastMemberDoc = null;
+let isLoadingMembers = false;
+const PAGE_SIZE = 20;
+
+async function loadMembers(isLoadMore = false) {
+  if (isLoadingMembers) return;
+  isLoadingMembers = true;
+  const membersList = document.getElementById('membersList');
+  if (!isLoadMore) {
+    membersList.innerHTML = `<div class="text-center py-8 text-gray-500">Memuat data anggota...</div>`;
+    lastMemberDoc = null;
+  }
   try {
-    const membersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+    console.time('loadMembers');
+    let membersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(PAGE_SIZE));
+    if (isLoadMore && lastMemberDoc) {
+      membersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'), startAfter(lastMemberDoc), limit(PAGE_SIZE));
+    }
     const snapshot = await getDocs(membersQuery);
-    
-    const membersList = document.getElementById('membersList');
-    
-    if (snapshot.empty) {
+    console.timeEnd('loadMembers');
+
+    if (!isLoadMore) membersList.innerHTML = '';
+
+    if (snapshot.empty && !isLoadMore) {
       membersList.innerHTML = `
         <div class="text-center py-8 text-gray-500">
           Belum ada anggota
         </div>
       `;
+      isLoadingMembers = false;
       return;
     }
 
@@ -182,16 +199,33 @@ async function loadMembers() {
       const data = doc.data();
       html += createMemberCard(doc.id, data);
     });
+    membersList.insertAdjacentHTML('beforeend', html);
 
-    membersList.innerHTML = html;
+    // Pagination: show/hide Load More
+    if (snapshot.size === PAGE_SIZE) {
+      lastMemberDoc = snapshot.docs[snapshot.docs.length - 1];
+      if (!document.getElementById('loadMoreMembersBtn')) {
+        const btn = document.createElement('button');
+        btn.id = 'loadMoreMembersBtn';
+        btn.className = 'w-full mt-4 bg-primary-100 text-primary-700 font-semibold py-2 rounded-lg';
+        btn.textContent = 'Muat Lebih Banyak';
+        btn.onclick = () => loadMembers(true);
+        membersList.parentElement.appendChild(btn);
+      }
+    } else {
+      lastMemberDoc = null;
+      const btn = document.getElementById('loadMoreMembersBtn');
+      if (btn) btn.remove();
+    }
   } catch (error) {
     console.error('Error loading members:', error);
-    document.getElementById('membersList').innerHTML = `
+    membersList.innerHTML = `
       <div class="text-center py-8 text-red-500">
         Gagal memuat data anggota
       </div>
     `;
   }
+  isLoadingMembers = false;
 }
 
 function createMemberCard(id, data) {
