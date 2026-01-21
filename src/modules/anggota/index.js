@@ -218,7 +218,7 @@ async function loadMembers(isLoadMore = false) {
       if (btn) btn.remove();
     }
   } catch (error) {
-    console.error('Error loading members:', error);
+    // Error loading members:
     membersList.innerHTML = `
       <div class="text-center py-8 text-red-500">
         Gagal memuat data anggota
@@ -303,7 +303,7 @@ function setupMemberHandlers() {
         });
         loadMembers();
       } catch (error) {
-        console.error('Error updating member status:', error);
+        // Error updating member status:
         alert('Gagal mengubah status anggota');
       }
     }
@@ -346,7 +346,7 @@ function setupMemberHandlers() {
         window.closeAddMemberModal();
         loadMembers();
       } catch (error) {
-        console.error('Error adding member:', error);
+        // Error adding member:
         errorMsg.textContent = error.message || 'Gagal menambahkan anggota';
         errorMsg.classList.remove('hidden');
       } finally {
@@ -358,5 +358,5 @@ function setupMemberHandlers() {
 }
 
 export default function init() {
-  console.log("Anggota Module Ready");
+  // Anggota Module Ready
 }

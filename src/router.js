@@ -98,7 +98,8 @@ class Router {
     // Load component
     try {
       if (!this.appContainer) {
-        console.error('App container not found');
+        // App container not found
+        document.body.innerHTML = `<div class="flex items-center justify-center h-screen"><div class="text-center"><h1 class="text-2xl font-bold text-red-600 mb-2">App Container Not Found</h1><button onclick="window.location.href='/dashboard'" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Go to Dashboard</button></div></div>`;
         return;
       }
 
@@ -119,7 +120,8 @@ class Router {
 
       this.currentRoute = path;
     } catch (error) {
-      console.error('Error loading route:', error);
+      // Error loading route:
+      this.appContainer.innerHTML = `<div class="flex items-center justify-center h-screen"><div class="text-center"><h1 class="text-2xl font-bold text-red-600 mb-2">Error Loading Page</h1><p class="text-gray-600">${error.message}</p><button onclick="window.location.href='/dashboard'" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Go to Dashboard</button></div></div>`;
       this.appContainer.innerHTML = `
         <div class="flex items-center justify-center h-screen">
           <div class="text-center">

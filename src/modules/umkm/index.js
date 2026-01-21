@@ -35,7 +35,7 @@ setTimeout(() => {
 async function loadUMKM() {
   const listEl = document.getElementById('umkmList');
   if (!listEl) return;
-  const snap = await getDocs(collection(db, 'umkm'));
+  const snap = await getDocs(query(collection(db, 'umkm'), limit(50)));
   if (snap.empty) {
     listEl.innerHTML = '<div class="col-span-2 text-center py-8 text-gray-500">Belum ada produk UMKM.</div>';
     return;
@@ -108,5 +108,5 @@ async function deleteUMKM(id) {
 }
 
 export default function init() {
-  console.log("UMKM Module Ready");
+  // UMKM Module Ready
 }

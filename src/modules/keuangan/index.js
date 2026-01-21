@@ -47,7 +47,7 @@ async function loadTransactions() {
   const listEl = document.getElementById('transactionsList');
   const saldoEl = document.getElementById('saldoKas');
   if (!listEl) return;
-  const snap = await getDocs(collection(db, 'keuangan'));
+  const snap = await getDocs(query(collection(db, 'keuangan'), limit(50)));
   if (snap.empty) {
     listEl.innerHTML = '<div class="text-center py-8 text-gray-500">Belum ada transaksi.</div>';
     if (saldoEl) saldoEl.textContent = 'Rp 0';
@@ -125,5 +125,5 @@ async function deleteTransaction(id) {
 }
 
 export default function init() {
-  console.log("Keuangan Module Ready");
+  // Keuangan Module Ready
 }

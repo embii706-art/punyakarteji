@@ -155,7 +155,7 @@ export function LoginPage(isRegistration = false) {
     if (switchToLoginBtn) {
       switchToLoginBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('Switching to login mode');
+        // Switching to login mode
         window.location.hash = 'login';
         // Re-render page in login mode
         document.getElementById('root').innerHTML = LoginPage(false);
@@ -203,7 +203,7 @@ export function LoginPage(isRegistration = false) {
             window.location.href = '/dashboard';
           }
         } catch (error) {
-          console.error('Auth error:', error);
+          // Auth error:
           errorMessage.textContent = error.message || 'Terjadi kesalahan. Silakan coba lagi.';
           errorMessage.classList.remove('hidden');
 

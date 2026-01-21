@@ -35,7 +35,7 @@ export async function uploadToCloudinary(file, onProgress = null) {
       height: data.height
     };
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    // Cloudinary upload error:
     throw error;
   }
 }

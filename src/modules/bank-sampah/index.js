@@ -35,13 +35,13 @@ setTimeout(() => {
 async function loadDeposits() {
   const listEl = document.getElementById('depositsList');
   if (!listEl) return;
-  const snap = await getDocs(collection(db, 'bank_sampah'));
+  const snap = await getDocs(query(collection(db, 'bank_sampah'), limit(50)));
   if (snap.empty) {
     listEl.innerHTML = '<div class="text-center py-8 text-gray-500">Belum ada setoran.</div>';
     return;
   }
   // Fetch anggota for name lookup
-  const anggotaSnap = await getDocs(collection(db, 'anggota'));
+  const anggotaSnap = await getDocs(query(collection(db, 'anggota'), limit(50)));
   const anggotaMap = {};
   anggotaSnap.forEach(doc => anggotaMap[doc.id] = doc.data().name);
   listEl.innerHTML = Array.from(snap.docs).map(doc => {
@@ -70,7 +70,7 @@ async function loadDeposits() {
 // Show add deposit modal
 async function showAddDepositModal() {
   // Fetch anggota for selection
-  const anggotaSnap = await getDocs(collection(db, 'anggota'));
+  const anggotaSnap = await getDocs(query(collection(db, 'anggota'), limit(50)));
   const anggotaList = Array.from(anggotaSnap.docs).map(doc => ({ id: doc.id, name: doc.data().name }));
   const anggotaId = prompt('ID anggota penyetor:\n' + anggotaList.map(a => `${a.id}: ${a.name}`).join('\n'));
   if (!anggotaId) return;
@@ -113,5 +113,5 @@ async function deleteDeposit(id) {
 }
 
 export default function init() {
-  console.log("Bank Sampah Module Ready");
+  // Bank Sampah Module Ready
 }

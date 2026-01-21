@@ -20,7 +20,7 @@ async function initApp() {
   const startTime = Date.now();
   
   try {
-    console.log('🚀 Starting KARTEJI app...');
+    // 🚀 Starting KARTEJI app...
     
     // Show loading timeout warning after 5 seconds
     const timeoutWarning = setTimeout(() => {
@@ -34,7 +34,7 @@ async function initApp() {
     }, 5000);
     
     // Initialize auth service with race condition
-    console.log('🔐 Initializing auth service...');
+    // 🔐 Initializing auth service...
     const authInitPromise = authService.init();
     
     // Set maximum wait time (10 seconds)
@@ -44,25 +44,25 @@ async function initApp() {
     
     await Promise.race([authInitPromise, timeoutPromise]);
     clearTimeout(timeoutWarning);
-    console.log('✅ Auth service initialized');
+    // ✅ Auth service initialized
 
     const user = authService.getCurrentUser();
-    console.log('👤 Current user:', user?.email || 'Not logged in');
+    // 👤 Current user: (hidden in production)
     
     const loadTime = Date.now() - startTime;
-    console.log(`⚡ App loaded in ${loadTime}ms`);
+    // ⚡ App loaded (timing hidden in production)
 
     // Hide loading screen immediately
     const loadingEl = document.getElementById('loading');
     if (loadingEl) {
-      console.log('🔄 Hiding loading screen...');
+      // 🔄 Hiding loading screen...
       loadingEl.style.display = 'none';
     }
     
     // Show root element immediately
     const rootEl = document.getElementById('root');
     if (rootEl) {
-      console.log('👁️ Showing root element...');
+      // 👁️ Showing root element...
       rootEl.style.display = 'block';
     }
 
@@ -74,31 +74,32 @@ async function initApp() {
       
       if (cachedHasUsers === null) {
         // First time - need to check
-        console.log('🔍 Checking for existing users...');
+        // 🔍 Checking for existing users...
         hasUsers = await authService.hasAnyUser();
         localStorage.setItem('karteji_has_users', hasUsers.toString());
       }
       
-      console.log('👥 Has users in system:', hasUsers);
+      // 👥 Has users in system: (hidden in production)
       
       if (!hasUsers) {
         // No users in system - show registration
-        console.log('📝 Showing registration screen (first user)');
+        // 📝 Showing registration screen (first user)
         showRegistrationScreen();
       } else {
         // Users exist - show login
-        console.log('🔑 Showing login screen');
+        // 🔑 Showing login screen
         showLoginScreen();
       }
     } else {
       // User logged in - initialize app immediately
-      console.log('✅ User logged in, initializing main app');
+      // ✅ User logged in, initializing main app
       // Set cache to true since we know users exist
       localStorage.setItem('karteji_has_users', 'true');
       initMainApp();
     }
   } catch (error) {
-    console.error('❌ Error initializing app:', error);
+    // ❌ Error initializing app:
+    showError('Gagal memulai aplikasi', error);
     const loadingEl = document.getElementById('loading');
     if (loadingEl) {
       loadingEl.style.opacity = '1';
@@ -119,33 +120,35 @@ async function initApp() {
 }
 
 function showLoginScreen() {
-  console.log('📄 Rendering login page...');
+  // 📄 Rendering login page...
   const rootEl = document.getElementById('root');
   if (!rootEl) {
-    console.error('❌ Root element not found!');
+    // ❌ Root element not found!
+    showError('Root element tidak ditemukan!');
     return;
   }
   
   rootEl.style.display = 'block';
   const loginHTML = LoginPage();
-  console.log('📝 Login HTML length:', loginHTML?.length || 0);
+  // 📝 Login HTML length: (hidden in production)
   rootEl.innerHTML = loginHTML;
-  console.log('✅ Login screen rendered');
+  // ✅ Login screen rendered
 }
 
 function showRegistrationScreen() {
-  console.log('📄 Rendering registration page...');
+  // 📄 Rendering registration page...
   const rootEl = document.getElementById('root');
   if (!rootEl) {
-    console.error('❌ Root element not found!');
+    // ❌ Root element not found!
+    showError('Root element tidak ditemukan!');
     return;
   }
   
   rootEl.style.display = 'block';
   const regHTML = LoginPage(true);
-  console.log('📝 Registration HTML length:', regHTML?.length || 0);
+  // 📝 Registration HTML length: (hidden in production)
   rootEl.innerHTML = regHTML;
-  console.log('✅ Registration screen rendered');
+  // ✅ Registration screen rendered
 }
 
 function initMainApp() {
@@ -211,9 +214,26 @@ function initMainApp() {
 }
 
 // Start the app
-console.log('🔥 Starting KARTEJI initialization...');
+// 🔥 Starting KARTEJI initialization...
 initApp().catch(err => {
-  console.error('💥 Fatal error during initialization:', err);
+  // 💥 Fatal error during initialization:
+  showError('Kesalahan fatal saat inisialisasi', err);
+  
+function showError(title, error) {
+  const loadingEl = document.getElementById('loading') || document.body;
+  loadingEl.innerHTML = `
+    <div class="text-center text-white p-4">
+      <h1 class="text-2xl font-bold mb-4">⚠️ ${title}</h1>
+      <p class="mb-4">${error?.message || error || ''}</p>
+      <button 
+        onclick="location.reload()" 
+        class="px-6 py-2 bg-white text-primary-600 rounded-lg font-semibold hover:bg-gray-100"
+      >
+        Reload
+      </button>
+    </div>
+  `;
+}
   const loadingEl = document.getElementById('loading');
   if (loadingEl) {
     loadingEl.innerHTML = `
@@ -237,12 +257,12 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(registration => {
-        console.log('ServiceWorker registered:', registration);
+        // ServiceWorker registered (hidden in production)
       })
       .catch(error => {
-        console.log('ServiceWorker registration failed:', error);
+        // ServiceWorker registration failed (hidden in production)
       });
   });
 }
-console.log("initApp called");
-console.log("authService.init resolved");
+// initApp called
+// authService.init resolved

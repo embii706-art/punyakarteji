@@ -80,10 +80,10 @@ async function loadDashboardStats() {
   const statsEl = document.getElementById('dashboardStats');
   if (!statsEl) return;
   // Fetch stats from Firebase
-  const anggotaSnap = await getDocs(collection(db, 'anggota'));
-  const bankSampahSnap = await getDocs(collection(db, 'bank_sampah'));
-  const keuanganSnap = await getDocs(collection(db, 'keuangan'));
-  const umkmSnap = await getDocs(collection(db, 'umkm'));
+  const anggotaSnap = await getDocs(query(collection(db, 'anggota'), limit(50)));
+  const bankSampahSnap = await getDocs(query(collection(db, 'bank_sampah'), limit(50)));
+  const keuanganSnap = await getDocs(query(collection(db, 'keuangan'), limit(50)));
+  const umkmSnap = await getDocs(query(collection(db, 'umkm'), limit(50)));
   statsEl.innerHTML = `
     ${createStatCard('Anggota', anggotaSnap.size, 'users', 'bg-blue-500')}
     ${createStatCard('Bank Sampah', `${bankSampahSnap.size} kg`, 'trash', 'bg-green-500')}
@@ -94,7 +94,7 @@ async function loadDashboardStats() {
 
 function getTotalKeuangan(snap) {
   let total = 0;
-  snap.forEach(doc => {
+  (snap.docs || []).forEach(doc => {
     const data = doc.data();
     if (data && typeof data.amount === 'number') total += data.amount;
   });
@@ -108,7 +108,7 @@ async function loadWasteChart() {
   // Fetch monthly waste data
   const wasteSnap = await getDocs(query(collection(db, 'bank_sampah'), orderBy('date')));
   const monthly = {};
-  wasteSnap.forEach(doc => {
+  (wasteSnap.docs || []).forEach(doc => {
     const data = doc.data();
     if (data && data.date && data.amount) {
       const month = data.date.substr(0,7); // YYYY-MM
@@ -138,7 +138,7 @@ async function loadFinanceChart() {
   // Fetch monthly finance data
   const financeSnap = await getDocs(query(collection(db, 'keuangan'), orderBy('date')));
   const monthly = {};
-  financeSnap.forEach(doc => {
+  (financeSnap.docs || []).forEach(doc => {
     const data = doc.data();
     if (data && data.date && data.amount) {
       const month = data.date.substr(0,7); // YYYY-MM
@@ -283,22 +283,22 @@ function getQuickActions(role) {
 async function loadDashboardData() {
   try {
     // Load member count
-    const membersSnapshot = await getDocs(collection(db, 'users'));
+    const membersSnapshot = await getDocs(query(collection(db, 'users'), limit(50)));
     document.getElementById('stat-users').textContent = membersSnapshot.size;
 
     // Load waste total
-    const wasteSnapshot = await getDocs(collection(db, 'waste_deposits'));
+    const wasteSnapshot = await getDocs(query(collection(db, 'waste_deposits'), limit(50)));
     let totalWaste = 0;
-    wasteSnapshot.forEach(doc => {
+    (wasteSnapshot.docs || []).forEach(doc => {
       totalWaste += doc.data().weight || 0;
     });
     document.getElementById('stat-trash').textContent = `${totalWaste.toFixed(1)} kg`;
 
     // Load finance balance (if permitted)
     if (authService.hasPermission('finance')) {
-      const transactionsSnapshot = await getDocs(collection(db, 'transactions'));
+      const transactionsSnapshot = await getDocs(query(collection(db, 'transactions'), limit(50)));
       let balance = 0;
-      transactionsSnapshot.forEach(doc => {
+      (transactionsSnapshot.docs || []).forEach(doc => {
         const data = doc.data();
         if (data.type === 'income' && data.status === 'approved') {
           balance += data.amount || 0;
@@ -310,13 +310,13 @@ async function loadDashboardData() {
     }
 
     // Load UMKM count
-    const umkmSnapshot = await getDocs(collection(db, 'umkm'));
+    const umkmSnapshot = await getDocs(query(collection(db, 'umkm'), limit(50)));
     document.getElementById('stat-store').textContent = umkmSnapshot.size;
 
     // Load recent activities
     loadRecentActivities();
   } catch (error) {
-    console.error('Error loading dashboard data:', error);
+    // Error loading dashboard data:
   }
 }
 
@@ -342,7 +342,7 @@ async function loadRecentActivities() {
     }
 
     let html = '';
-    wasteSnapshot.forEach(doc => {
+    (wasteSnapshot.docs || []).forEach(doc => {
       const data = doc.data();
       const date = data.createdAt?.toDate?.() || new Date();
       html += `
@@ -363,7 +363,7 @@ async function loadRecentActivities() {
 
     activitiesDiv.innerHTML = html;
   } catch (error) {
-    console.error('Error loading activities:', error);
+    // Error loading activities:
     document.getElementById('recentActivities').innerHTML = `
       <div class="text-center text-red-500 py-4">
         <p>Gagal memuat aktivitas</p>
@@ -382,7 +382,7 @@ function initCharts() {
       }
     })
     .catch(error => {
-      console.error('Error loading Chart.js:', error);
+      // Error loading Chart.js:
     });
 }
 

@@ -4,7 +4,7 @@ import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth'
 import { getFirestore, enableIndexedDbPersistence, initializeFirestore, CACHE_SIZE_UNLIMITED } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-console.log('🔥 Initializing Firebase...');
+// 🔥 Initializing Firebase...
 
 // Firebase Web Config
 const firebaseConfig = {
@@ -21,11 +21,11 @@ let app, auth, db, storage;
 
 try {
   app = initializeApp(firebaseConfig);
-  console.log('✅ Firebase app initialized');
+  // ✅ Firebase app initialized
 
   // Firebase Auth - fastest initialization
   auth = getAuth(app);
-  console.log('✅ Firebase Auth initialized');
+  // ✅ Firebase Auth initialized
   
   // Set persistence asynchronously - don't block
   setPersistence(auth, browserLocalPersistence).catch((error) => {
@@ -36,7 +36,7 @@ try {
   db = initializeFirestore(app, {
     cacheSizeBytes: CACHE_SIZE_UNLIMITED
   });
-  console.log('✅ Firestore initialized');
+  // ✅ Firestore initialized
   
   // Enable offline persistence asynchronously - don't block
   enableIndexedDbPersistence(db).catch((err) => {
@@ -49,11 +49,11 @@ try {
   
   // Storage - lazy init
   storage = getStorage(app);
-  console.log('✅ Firebase Storage initialized');
+  // ✅ Firebase Storage initialized
   
-  console.log('🎉 Firebase ready!');
+  // 🎉 Firebase ready!
 } catch (error) {
-  console.error('❌ Firebase initialization error:', error);
+  // ❌ Firebase initialization error:
   throw error;
 }
 

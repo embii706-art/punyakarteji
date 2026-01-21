@@ -297,7 +297,7 @@ async function loadAspirations() {
 
     renderAspirations();
   } catch (error) {
-    console.error('Error loading aspirations:', error);
+    // Error loading aspirations:
     const list = document.getElementById('aspirationsList');
     if (list) list.innerHTML = `
       <div class="text-center py-8 text-red-500">
@@ -492,7 +492,7 @@ function setupHandlers() {
         window.closeDetailModal();
         await loadAspirations();
       } catch (error) {
-        console.error('Error updating aspiration:', error);
+        // Error updating aspiration:
         alert('Gagal memperbarui aspirasi');
       }
     };
@@ -537,7 +537,7 @@ function setupHandlers() {
         window.closeSubmitModal();
         await loadAspirations();
       } catch (error) {
-        console.error('Error submitting aspiration:', error);
+        // Error submitting aspiration:
         errorMsg.textContent = error.message || 'Gagal mengirim aspirasi';
         errorMsg.classList.remove('hidden');
       } finally {

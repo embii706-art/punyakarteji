@@ -101,7 +101,7 @@ class ThemeManager {
         return stored;
       }
     } catch (error) {
-      console.error('Error reading theme from storage:', error);
+      // Error reading theme from storage:
     }
     return null;
   }
@@ -113,7 +113,7 @@ class ThemeManager {
     try {
       localStorage.setItem(STORAGE_KEY, theme);
     } catch (error) {
-      console.error('Error storing theme:', error);
+      // Error storing theme:
     }
   }
 
@@ -125,7 +125,7 @@ class ThemeManager {
     const styles = THEME_STYLES[theme];
 
     if (!styles) {
-      console.error('Invalid theme:', theme);
+      // Invalid theme:
       return;
     }
 
@@ -164,7 +164,7 @@ class ThemeManager {
    */
   setTheme(theme) {
     if (!Object.values(THEMES).includes(theme)) {
-      console.error('Invalid theme:', theme);
+      // Invalid theme:
       return;
     }
     this.applyTheme(theme);
