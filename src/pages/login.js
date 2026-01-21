@@ -53,6 +53,14 @@ export function LoginPage(isRegistration = false) {
                 <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
                 <input type="password" id="confirmPassword" required minlength="6" class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Ketik ulang password" />
               </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nomor HP</label>
+                <input type="tel" id="phone" class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="08xxxxxxxxxx" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                <textarea id="address" rows="2" class="w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Alamat lengkap"></textarea>
+              </div>
             `}
             <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm"></div>
             <button type="submit" id="submitBtn" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl transition duration-200 flex items-center justify-center text-base shadow-md hover:shadow-lg">
@@ -151,8 +159,10 @@ export function LoginPage(isRegistration = false) {
         btnText.classList.add('hidden');
         btnSpinner.classList.remove('hidden');
         try {
-          // Register user (anggota)
-          await authService.registerAnggota(name, email, password);
+          const phone = document.getElementById('phone').value;
+          const address = document.getElementById('address').value;
+          // Register user (anggota/super_admin)
+          await authService.registerAnggota(name, email, password, phone, address);
           // Login otomatis setelah register
           await authService.login(email, password);
           window.location.href = '/dashboard';
