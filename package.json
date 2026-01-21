@@ -1,6 +1,6 @@
 {
   "name": "karteji",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "KARTEJI - Karang Taruna Digital Application",
   "main": "index.js",
   "type": "module",

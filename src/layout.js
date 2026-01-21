@@ -1,18 +1,37 @@
 // Layout component with bottom navigation
 import { authService } from './auth/auth.service.js';
+import { getSpecialTheme } from './config/specialTheme.js';
 import { PERMISSIONS } from './auth/roles.js';
 
 export function createLayout() {
   const profile = authService.getUserProfile();
-  
+  const special = getSpecialTheme(new Date());
+  // Logo logic: dark/light/special
+  let logo = '/logo.jpeg';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (special && special.image) {
+    logo = special.image;
+  } else if (isDark && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    // If you have a dark logo, use it here (e.g. /logo-dark.jpeg)
+    if (window.logoDark) logo = window.logoDark;
+    else if (logo.endsWith('.jpeg')) logo = logo.replace('.jpeg', '-dark.jpeg');
+    else if (logo.endsWith('.png')) logo = logo.replace('.png', '-dark.png');
+  }
   return `
     <!-- Main App Layout -->
     <div class="h-screen flex flex-col bg-gray-50 overflow-hidden">
+      <!-- Special Theme Banner & Animation -->
+      ${special ? `
+        <div class="w-full flex items-center justify-center py-2 bg-opacity-90" style="background:${special.color};color:#fff;">
+          <img src="${special.image}" alt="${special.name}" class="h-10 w-10 object-contain mr-2 animate-bounce" style="background:transparent;">
+          <span class="font-bold text-lg">${special.icon} ${special.banner}</span>
+        </div>
+      ` : ''}
       <!-- Top App Bar -->
       <header class="bg-primary-600 text-white shadow-lg flex-shrink-0">
         <div class="px-3 py-2 sm:px-4 sm:py-3 flex items-center justify-between">
           <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-            <img src="/logo.jpeg" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover flex-shrink-0" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <img src="${logo}" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover flex-shrink-0" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
             <svg class="w-7 h-7 sm:w-8 sm:h-8 hidden flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>

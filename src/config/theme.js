@@ -122,11 +122,16 @@ class ThemeManager {
    */
   applyTheme(theme) {
     const root = document.documentElement;
-    const styles = THEME_STYLES[theme];
+    let styles = THEME_STYLES[theme];
+    if (!styles) return;
 
-    if (!styles) {
-      // Invalid theme:
-      return;
+    // Cek hari besar
+    const special = getSpecialTheme(new Date());
+    if (special && special.cssVars) {
+      styles = { ...styles, ...special.cssVars };
+      root.setAttribute('data-special-theme', special.key);
+    } else {
+      root.removeAttribute('data-special-theme');
     }
 
     // Apply CSS variables
@@ -134,20 +139,17 @@ class ThemeManager {
       root.style.setProperty(property, value);
     });
 
-    // Update data attribute for CSS targeting
-    root.setAttribute('data-theme', theme);
-
     // Update meta theme-color for mobile browsers
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', theme === THEMES.DARK ? '#1f2937' : '#0ea5e9');
+      metaThemeColor.setAttribute('content', styles['--color-primary'] || (theme === THEMES.DARK ? '#1f2937' : '#0ea5e9'));
     }
 
     this.currentTheme = theme;
     this.storeTheme(theme);
 
     // Notify listeners
-    this.listeners.forEach(callback => callback(theme));
+    this.listeners.forEach(callback => callback(theme, special));
   }
 
   /**
