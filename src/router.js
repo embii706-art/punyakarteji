@@ -47,8 +47,12 @@ class Router {
         await this.loadRoute(matchedRoute, path, pushState);
         return;
       }
-      
-      // Route not found - redirect to 404 or dashboard
+      // Route not found - avoid infinite redirect loop
+      if (path === '/dashboard') {
+        // Already at dashboard, show 404 message
+        document.body.innerHTML = `<div class="flex items-center justify-center h-screen"><div class="text-center"><h1 class="text-2xl font-bold text-red-600 mb-2">404 - Halaman tidak ditemukan</h1><p class="text-gray-600">Halaman <b>${path}</b> tidak tersedia.</p></div></div>`;
+        return;
+      }
       console.warn(`Route not found: ${path}`);
       this.navigate('/dashboard', pushState);
       return;

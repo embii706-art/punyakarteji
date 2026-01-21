@@ -7,28 +7,29 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+
     function getUserData() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data : null;
     }
-    
+
     function hasRole(role) {
-      return isAuthenticated() && getUserData().role == role;
+      return isAuthenticated() && getUserData() != null && getUserData().role == role;
     }
-    
+
     function isSuperAdmin() {
       return hasRole('super_admin');
     }
-    
+
     function isAdmin() {
       return isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua');
     }
-    
+
     function isBendahara() {
       return hasRole('bendahara');
     }
-    
+
     function isActive() {
-      return isAuthenticated() && getUserData().isActive == true;
+      return isAuthenticated() && getUserData() != null && getUserData().isActive == true;
     }
 
     // Users collection
