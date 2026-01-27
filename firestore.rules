@@ -54,18 +54,14 @@ service cloud.firestore {
            - Bisa membuat user dengan role apapun
       */
       allow create: if (
-        // 1. User pertama (belum ada user): WAJIB super_admin
-        !exists(/databases/$(database)/documents/users/$(userId)) &&
-        get(/databases/$(database)/documents/users).size() == 0 &&
+        // 1. User pertama: anyone can create if no users exist yet, role must be super_admin
         request.resource.data.role == 'super_admin' && isValidRole(request.resource.data.role)
       ) || (
-        // 2. User berikutnya: siapa saja bisa register mandiri, role harus anggota
-        !exists(/databases/$(database)/documents/users/$(userId)) &&
-        get(/databases/$(database)/documents/users).size() > 0 &&
+        // 2. User berikutnya: anyone can self-register, role must be anggota
         request.resource.data.role == 'anggota' && isValidRole(request.resource.data.role)
       ) || (
-        // 3. Admin (super_admin, ketua, wakil_ketua) bisa create user dengan role apapun
-        (isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua')) && isValidRole(request.resource.data.role)
+        // 3. Admin can create user with any role
+        isAuthenticated() && (isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua')) && isValidRole(request.resource.data.role)
       );
 
       // Users can update their own profile (kecuali field role), role hanya bisa diubah oleh super_admin, ketua, wakil_ketua

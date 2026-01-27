@@ -15,6 +15,23 @@ import { FinancePage } from './modules/keuangan/index.js';
 import { UMKMPage } from './modules/umkm/index.js';
 import { AspirationPage } from './modules/aspiration/index.js';
 
+// Helper function to show error messages
+function showError(title, error) {
+  const loadingEl = document.getElementById('loading') || document.body;
+  loadingEl.innerHTML = `
+    <div class="text-center text-white p-4">
+      <h1 class="text-2xl font-bold mb-4">⚠️ ${title}</h1>
+      <p class="mb-4">${error?.message || error || ''}</p>
+      <button 
+        onclick="location.reload()" 
+        class="px-6 py-2 bg-white text-primary-600 rounded-lg font-semibold hover:bg-gray-100"
+      >
+        Reload
+      </button>
+    </div>
+  `;
+}
+
 // Initialize app
 async function initApp() {
   const startTime = Date.now();
@@ -194,28 +211,11 @@ function initMainApp() {
 // 🔥 Starting KARTEJI initialization...
 initApp().catch(err => {
   // 💥 Fatal error during initialization:
-  showError('Kesalahan fatal saat inisialisasi', err);
-  
-function showError(title, error) {
-  const loadingEl = document.getElementById('loading') || document.body;
-  loadingEl.innerHTML = `
-    <div class="text-center text-white p-4">
-      <h1 class="text-2xl font-bold mb-4">⚠️ ${title}</h1>
-      <p class="mb-4">${error?.message || error || ''}</p>
-      <button 
-        onclick="location.reload()" 
-        class="px-6 py-2 bg-white text-primary-600 rounded-lg font-semibold hover:bg-gray-100"
-      >
-        Reload
-      </button>
-    </div>
-  `;
-}
   const loadingEl = document.getElementById('loading');
   if (loadingEl) {
     loadingEl.innerHTML = `
       <div class="text-center text-white p-4">
-        <h1 class="text-2xl font-bold mb-4">❌ Error</h1>
+        <h1 class="text-2xl font-bold mb-4">❌ Fatal Error</h1>
         <p class="mb-2 text-red-200">${err.message}</p>
         <pre class="text-xs text-left bg-red-900 p-2 rounded mb-4 overflow-auto">${err.stack}</pre>
         <button 
@@ -241,5 +241,3 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
-// initApp called
-// authService.init resolved

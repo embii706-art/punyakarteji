@@ -13,7 +13,7 @@ class Router {
    */
   init(containerId = 'app') {
     this.appContainer = document.getElementById(containerId);
-    
+
     // Handle browser back/forward
     window.addEventListener('popstate', () => {
       this.navigate(window.location.pathname, false);
@@ -84,10 +84,10 @@ class Router {
     // Check guards
     if (route.guard) {
       const allowed = route.guard(
-        () => {}, // next
+        () => { }, // next
         (redirectPath) => this.navigate(redirectPath, true) // redirect
       );
-      
+
       if (!allowed) return;
     }
 
@@ -125,7 +125,6 @@ class Router {
       this.currentRoute = path;
     } catch (error) {
       // Error loading route:
-      this.appContainer.innerHTML = `<div class="flex items-center justify-center h-screen"><div class="text-center"><h1 class="text-2xl font-bold text-red-600 mb-2">Error Loading Page</h1><p class="text-gray-600">${error.message}</p><button onclick="window.location.href='/dashboard'" class="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg">Go to Dashboard</button></div></div>`;
       this.appContainer.innerHTML = `
         <div class="flex items-center justify-center h-screen">
           <div class="text-center">

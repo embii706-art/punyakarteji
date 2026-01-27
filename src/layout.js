@@ -28,21 +28,21 @@ export function createLayout() {
         </div>
       ` : ''}
       <!-- Top App Bar -->
-      <header class="bg-primary-600 text-white shadow-lg flex-shrink-0">
-        <div class="px-3 py-2 sm:px-4 sm:py-3 flex items-center justify-between">
-          <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-            <img src="${logo}" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover flex-shrink-0" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-            <svg class="w-7 h-7 sm:w-8 sm:h-8 hidden flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <header class="bg-gradient-to-br from-primary-600 via-primary-500 to-cyan-500 text-white shadow-xl flex-shrink-0">
+        <div class="px-4 py-3.5 flex items-center justify-between">
+          <div class="flex items-center space-x-3 min-w-0 flex-1">
+            <img src="${logo}" alt="Logo" class="w-10 h-10 rounded-xl object-cover flex-shrink-0 shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <svg class="w-8 h-8 hidden flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <div class="min-w-0">
-              <h1 class="text-base sm:text-lg font-bold truncate">KARTEJI</h1>
-              <p class="text-xs text-primary-100 hidden sm:block">Karang Taruna Digital</p>
+              <h1 class="text-lg font-black truncate">KARTEJI</h1>
+              <p class="text-xs text-white/90 hidden sm:block font-medium">Karang Taruna Digital</p>
             </div>
           </div>
-          <button id="profileBtn" class="flex items-center hover:bg-primary-700 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 transition flex-shrink-0">
-            <div class="w-7 h-7 sm:w-8 sm:h-8 bg-primary-400 rounded-full flex items-center justify-center">
-              <span class="text-xs sm:text-sm font-semibold">${profile?.name?.charAt(0).toUpperCase() || 'U'}</span>
+          <button id="profileBtn" class="flex items-center hover:bg-white/20 rounded-xl px-3 py-2 transition-smooth flex-shrink-0">
+            <div class="w-9 h-9 bg-white/30 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-md">
+              <span class="text-sm font-bold">${profile?.name?.charAt(0).toUpperCase() || 'U'}</span>
             </div>
           </button>
         </div>
@@ -54,8 +54,8 @@ export function createLayout() {
       </main>
 
       <!-- Bottom Navigation -->
-      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-primary-200 shadow-2xl z-50 flex-shrink-0 rounded-t-2xl animate-fade-in">
-        <div class="flex justify-around items-center h-16 sm:h-20 px-2 sm:px-6 gap-1">
+      <nav class="fixed bottom-0 left-0 right-0 glass-card border-t-2 border-primary-100 shadow-2xl z-50 flex-shrink-0 rounded-t-3xl animate-fade-in">
+        <div class="flex justify-around items-center h-20 px-4 gap-1">
           ${createNavItem('dashboard', 'Dashboard', `
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           `)}
@@ -87,21 +87,21 @@ export function createLayout() {
 
 function createNavItem(route, label, iconPath) {
   return `
-    <a href="/${route}" data-route="${route}" class="nav-item flex flex-col items-center justify-center flex-1 py-2 sm:py-3 text-gray-500 hover:text-primary-600 transition relative">
-      <div class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-primary-200 shadow-md mb-1">
-        <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="/${route}" data-route="${route}" class="nav-item flex flex-col items-center justify-center flex-1 py-3 text-gray-500 hover:text-primary-600 transition-smooth relative group">
+      <div class="w-12 h-12 flex items-center justify-center rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 shadow-md group-hover:shadow-lg group-hover:scale-110 transition-premium mb-1.5">
+        <svg class="w-6 h-6 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           ${iconPath}
         </svg>
       </div>
-      <span class="text-xs sm:text-sm font-semibold">${label}</span>
-      <span class="active-indicator absolute -top-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary-500 rounded-full opacity-0 transition-all"></span>
+      <span class="text-xs font-bold transition-colors">${label}</span>
+      <span class="active-indicator absolute -top-1 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-primary-500 to-blue-500 rounded-full opacity-0 transition-all duration-300 shadow-glow"></span>
     </a>
   `;
 }
 
 export function initLayout() {
   document.body.innerHTML = createLayout();
-  
+
   // Handle navigation clicks
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
@@ -123,14 +123,24 @@ export function initLayout() {
 
 function updateActiveNav(route) {
   document.querySelectorAll('.nav-item').forEach(item => {
+    const indicator = item.querySelector('.active-indicator');
+    const iconContainer = item.querySelector('div');
     if (item.dataset.route === route) {
       item.classList.add('text-primary-600');
       item.classList.remove('text-gray-500');
-      item.querySelector('.active-indicator').style.opacity = '1';
+      if (indicator) indicator.style.opacity = '1';
+      if (iconContainer) {
+        iconContainer.classList.add('bg-gradient-to-br', 'from-primary-500', 'to-blue-500', 'shadow-glow');
+        iconContainer.classList.remove('from-gray-100', 'to-gray-200');
+      }
     } else {
       item.classList.remove('text-primary-600');
       item.classList.add('text-gray-500');
-      item.querySelector('.active-indicator').style.opacity = '0';
+      if (indicator) indicator.style.opacity = '0';
+      if (iconContainer) {
+        iconContainer.classList.remove('bg-gradient-to-br', 'from-primary-500', 'to-blue-500', 'shadow-glow');
+        iconContainer.classList.add('from-gray-100', 'to-gray-200');
+      }
     }
   });
 }
