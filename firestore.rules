@@ -1,19 +1,34 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Helper functions
+
+    /* =====================================================
+       COMMON HELPERS
+    ====================================================== */
+
     function isAuthenticated() {
       return request.auth != null;
     }
-    
 
-    function getUserData() {
-      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data : null;
+    function userRef() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function userExists() {
+      return isAuthenticated() && exists(userRef());
+    }
+
+    function userData() {
+      return userExists() ? get(userRef()).data : null;
+    }
+
+    function isActive() {
+      return userData() != null && userData().isActive == true;
     }
 
     function hasRole(role) {
-      return isAuthenticated() && getUserData() != null && getUserData().role == role;
+      return userData() != null && userData().role == role;
     }
 
     function isSuperAdmin() {
@@ -21,93 +36,186 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua');
+      return isSuperAdmin()
+        || hasRole('ketua')
+        || hasRole('wakil_ketua');
     }
 
     function isBendahara() {
       return hasRole('bendahara');
     }
 
-    function isActive() {
-      return isAuthenticated() && getUserData() != null && getUserData().isActive == true;
+    function isValidRole(role) {
+      return role in [
+        'super_admin',
+        'ketua',
+        'wakil_ketua',
+        'bendahara',
+        'sekretaris',
+        'humas',
+        'anggota'
+      ];
     }
 
-    // Users collection
+    function canAccessApp() {
+      return isAuthenticated() && userExists() && isActive();
+    }
+
+    /* =====================================================
+       USERS
+    ====================================================== */
+
     match /users/{userId} {
-      // Valid roles
-      function isValidRole(role) {
-        return role in [
-          'super_admin', 'ketua', 'wakil_ketua', 'bendahara', 'sekretaris', 'humas', 'anggota'
-        ];
-      }
 
-      // Anyone authenticated can read their own profile
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // User boleh baca data dirinya sendiri
+      // Admin boleh baca semua
+      allow read: if isAuthenticated()
+        && (request.auth.uid == userId || isAdmin());
 
-      /*
-        CREATE USER RULES:
-        1. User pertama (belum ada user):
-           - WAJIB register sebagai super_admin
-        2. User berikutnya (sudah ada user):
-           - Siapa saja bisa register mandiri, role harus anggota
-        3. Admin (super_admin, ketua, wakil_ketua):
-           - Bisa membuat user dengan role apapun
-      */
-      allow create: if (
-        // 1. User pertama: anyone can create if no users exist yet, role must be super_admin
-        request.resource.data.role == 'super_admin' && isValidRole(request.resource.data.role)
-      ) || (
-        // 2. User berikutnya: anyone can self-register, role must be anggota
-        request.resource.data.role == 'anggota' && isValidRole(request.resource.data.role)
-      ) || (
-        // 3. Admin can create user with any role
-        isAuthenticated() && (isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua')) && isValidRole(request.resource.data.role)
-      );
+      // ❌ CLIENT TIDAK BOLEH CREATE USER
+      // User dibuat via Cloud Function (Admin SDK)
+      allow create: if false;
 
-      // Users can update their own profile (kecuali field role), role hanya bisa diubah oleh super_admin, ketua, wakil_ketua
-      allow update: if isAuthenticated() && (
+      // User update profil sendiri (field aman)
+      allow update: if isAuthenticated()
+        && request.auth.uid == userId
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly(['displayName', 'photoURL']);
+
+      // Admin update role & status saja
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly(['role', 'isActive'])
+        && isValidRole(request.resource.data.role);
+
+      // Hanya super admin boleh delete user
+      allow delete: if isSuperAdmin();
+    }
+
+    /* =====================================================
+       WASTE DEPOSITS
+    ====================================================== */
+
+    match /waste_deposits/{id} {
+      allow read, create: if canAccessApp();
+
+      allow update, delete: if canAccessApp()
+        && (request.auth.uid == resource.data.createdBy || isAdmin());
+    }
+
+    /* =====================================================
+       TRANSACTIONS
+    ====================================================== */
+
+    match /transactions/{id} {
+      allow read: if canAccessApp();
+
+      allow create: if canAccessApp()
+        && (isBendahara() || isAdmin());
+
+      allow update: if canAccessApp() && (
         (
-          request.auth.uid == userId &&
-          request.resource.data.role == resource.data.role &&
-          request.resource.data.isActive == resource.data.isActive
+          isBendahara()
+          && resource.data.status == 'pending'
+          && request.resource.data.diff(resource.data)
+            .affectedKeys()
+            .hasOnly(['amount', 'description'])
         ) ||
         (
-          (isSuperAdmin() || hasRole('ketua') || hasRole('wakil_ketua')) && isValidRole(request.resource.data.role)
+          isAdmin()
+          && request.resource.data.diff(resource.data)
+            .affectedKeys()
+            .hasOnly(['status', 'approvedBy', 'approvedAt'])
         )
       );
 
-      // Only super admin can delete users
       allow delete: if isSuperAdmin();
     }
 
-    // Waste Deposits collection (Bank Sampah)
-    match /waste_deposits/{depositId} {
-      // Anyone authenticated can read
-      allow read: if isAuthenticated() && isActive();
-      
-      // Users with bank_sampah permission can create
-      allow create: if isAuthenticated() && isActive();
-      
-      // Only creator or admin can update/delete
-      allow update, delete: if isAuthenticated() && isActive() && 
-        (request.auth.uid == resource.data.createdBy || isAdmin());
+    /* =====================================================
+       UMKM
+    ====================================================== */
+
+    match /umkm/{id} {
+      allow read, create: if canAccessApp();
+
+      allow update, delete: if canAccessApp()
+        && (request.auth.uid == resource.data.createdBy || isAdmin());
     }
 
-    // Transactions collection (Finance)
-    match /transactions/{transactionId} {
-      // Anyone authenticated can read
-      allow read: if isAuthenticated() && isActive();
-      
-      // Bendahara and admins can create
-      allow create: if isAuthenticated() && isActive() && (isBendahara() || isAdmin());
-      
-      // Only bendahara can update pending transactions
-      // Ketua/Wakil can approve transactions
-      allow update: if isAuthenticated() && isActive() && (
-        (isBendahara() && resource.data.status == 'pending') ||
-        (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'approvedBy', 'approvedAt']))
-      );
-      
-      // Only super admin can delete
-      allow delete: if isSuperAdmin();
+    /* =====================================================
+       BANK SAMPAH
+    ====================================================== */
+
+    match /bank_sampah/{id} {
+      allow read, create: if canAccessApp();
+
+      allow update, delete: if canAccessApp()
+        && (request.auth.uid == resource.data.createdBy || isAdmin());
     }
+
+    /* =====================================================
+       KEUANGAN
+    ====================================================== */
+
+    match /keuangan/{id} {
+      allow read: if canAccessApp();
+
+      allow create: if canAccessApp()
+        && (isBendahara() || isAdmin());
+
+      allow update, delete: if canAccessApp()
+        && (request.auth.uid == resource.data.createdBy || isAdmin());
+    }
+
+    /* =====================================================
+       ANGGOTA
+    ====================================================== */
+
+    match /anggota/{id} {
+      allow read: if canAccessApp();
+      allow write: if canAccessApp() && isAdmin();
+    }
+
+    /* =====================================================
+       ACTIVITIES
+    ====================================================== */
+
+    match /activities/{id} {
+      allow read, create: if canAccessApp();
+      allow update, delete: if isAdmin();
+    }
+
+    /* =====================================================
+       ASPIRATIONS
+    ====================================================== */
+
+    match /aspirations/{id} {
+      allow read, create: if canAccessApp();
+
+      allow update: if canAccessApp()
+        && (request.auth.uid == resource.data.createdBy || isAdmin());
+
+      allow delete: if isAdmin();
+    }
+
+    /* =====================================================
+       CONFIG
+    ====================================================== */
+
+    match /config/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin();
+    }
+
+    /* =====================================================
+       DEFAULT DENY (WAJIB ADA)
+    ====================================================== */
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
