@@ -1,10 +1,8 @@
 // Firebase core configuration for KARTEJI
 import { initializeApp } from 'firebase/app';
 import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence, initializeFirestore, CACHE_SIZE_UNLIMITED } from 'firebase/firestore';
+import { initializeFirestore, CACHE_SIZE_UNLIMITED } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-
-// 🔥 Initializing Firebase...
 
 // Firebase Web Config
 const firebaseConfig = {
@@ -18,44 +16,26 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app, auth, db, storage;
+const app = initializeApp(firebaseConfig);
 
-try {
-  app = initializeApp(firebaseConfig);
-  // ✅ Firebase app initialized
+// Auth
+const auth = getAuth(app);
 
-  // Firebase Auth - fastest initialization
-  auth = getAuth(app);
-  // ✅ Firebase Auth initialized
+// Persist auth session (async, non-blocking)
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.warn('⚠️ Auth persistence error:', error.code);
+});
 
-  // Set persistence asynchronously - don't block
-  setPersistence(auth, browserLocalPersistence).catch((error) => {
-    console.warn('⚠️ Auth persistence error:', error.code);
-  });
+// Firestore (NEW CACHE API — FUTURE PROOF)
+const db = initializeFirestore(app, {
+  cache: {
+    kind: "persistent",          // IndexedDB
+    // synchronizeTabs: true,     // enable if you want multi-tab sync
+  },
+  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+});
 
-  // Initialize Firestore with optimized cache
-  db = initializeFirestore(app, {
-    cacheSizeBytes: CACHE_SIZE_UNLIMITED
-  });
-  // ✅ Firestore initialized
-
-  // Enable offline persistence asynchronously - don't block
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('⚠️ Offline persistence: Multiple tabs open');
-    } else if (err.code === 'unimplemented') {
-      console.warn('⚠️ Offline persistence: Not supported');
-    }
-  });
-
-  // Storage - lazy init
-  storage = getStorage(app);
-  // ✅ Firebase Storage initialized
-
-  // 🎉 Firebase ready!
-} catch (error) {
-  // ❌ Firebase initialization error:
-  throw error;
-}
+// Storage
+const storage = getStorage(app);
 
 export { app, auth, db, storage };
