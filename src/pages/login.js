@@ -126,7 +126,20 @@ export function LoginPage(isRegistration = false) {
         btnSpinner.classList.remove('hidden');
         errorMessage.classList.add('hidden');
         try {
-          await authService.login(email, password);
+          // Login user
+          const { user } = await authService.login(email, password);
+          // Tunggu dokumen user ada dan isActive === true
+          let userDoc, retries = 0;
+          const maxRetries = 20; // ~4 detik
+          const delay = ms => new Promise(res => setTimeout(res, ms));
+          while (retries < maxRetries) {
+            userDoc = await authService.loadUserProfile();
+            if (userDoc && userDoc.isActive) break;
+            await delay(200);
+            retries++;
+          }
+          if (!userDoc) throw new Error('Akun Anda belum aktif. Silakan coba beberapa saat lagi.');
+          if (!userDoc.isActive) throw new Error('Akun Anda dinonaktifkan. Hubungi admin.');
           window.location.href = '/dashboard';
         } catch (error) {
           errorMessage.textContent = error.message || 'Terjadi kesalahan. Silakan coba lagi.';
